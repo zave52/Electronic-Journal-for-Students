@@ -56,4 +56,46 @@ export class AuthService {
     localStorage.removeItem(STORAGE_KEY);
     this.currentUserSubject.next(null);
   }
+
+  /**
+   * Check if a user is currently logged in
+   * @returns boolean indicating authentication status
+   */
+  isLoggedIn(): boolean {
+    return this.getUserFromStorage() !== null;
+  }
+
+  /**
+   * Get the currently logged in user
+   * @returns User object or null if not authenticated
+   */
+  getCurrentUser(): User | null {
+    return this.getUserFromStorage();
+  }
+
+  /**
+   * Get the role of the currently logged in user
+   * @returns User role string or null if not authenticated
+   */
+  getUserRole(): string | null {
+    const user = this.getUserFromStorage();
+    return user ? user.role : null;
+  }
+
+  /**
+   * Private helper method to retrieve and parse user data from localStorage
+   * @returns User object or null if not found or invalid
+   */
+  private getUserFromStorage(): User | null {
+    try {
+      const userJson = localStorage.getItem(STORAGE_KEY);
+      if (!userJson) {
+        return null;
+      }
+      return JSON.parse(userJson) as User;
+    } catch (error) {
+      console.error('Error parsing user from storage:', error);
+      return null;
+    }
+  }
 }
