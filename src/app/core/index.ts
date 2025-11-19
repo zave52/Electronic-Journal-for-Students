@@ -1,5 +1,9 @@
 export * from './models';
 export * from './guards';
 export * from './interceptors';
-
-
+export * from './services/auth';
+export * from './services/user';
+export * from './services/course';
+export * from './services/lesson';
+export * from './services/assignment';
+export * from './services/grade';
