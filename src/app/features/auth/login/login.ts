@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core';
@@ -12,7 +12,7 @@ import { AuthService } from '../../../core';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -26,6 +26,30 @@ export class LoginComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
+  }
+
+  ngOnInit(): void {
+    // If user is already logged in, redirect to their dashboard
+    if (this.authService.isLoggedIn()) {
+      this.redirectBasedOnRole();
+    }
+  }
+
+  private redirectBasedOnRole(): void {
+    const role = this.authService.getUserRole();
+    switch (role) {
+      case 'admin':
+        this.router.navigate(['/admin/dashboard']);
+        break;
+      case 'teacher':
+        this.router.navigate(['/teacher/courses']);
+        break;
+      case 'student':
+        this.router.navigate(['/student/courses']);
+        break;
+      default:
+        this.router.navigate(['/']);
+    }
   }
 
   onSubmit(): void {
@@ -42,21 +66,9 @@ export class LoginComponent {
     };
 
     this.authService.login(credentials).subscribe({
-      next: (user) => {
+      next: () => {
         this.isLoading.set(false);
-        switch (user.role) {
-          case 'admin':
-            this.router.navigate(['/admin/dashboard']);
-            break;
-          case 'teacher':
-            this.router.navigate(['/teacher/courses']);
-            break;
-          case 'student':
-            this.router.navigate(['/student/courses']);
-            break;
-          default:
-            this.router.navigate(['/']);
-        }
+        this.redirectBasedOnRole();
       },
       error: (error: Error) => {
         this.isLoading.set(false);
