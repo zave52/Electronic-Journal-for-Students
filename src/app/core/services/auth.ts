@@ -1,4 +1,5 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
@@ -13,6 +14,8 @@ const STORAGE_KEY = 'currentUser';
 })
 export class AuthService {
   private http = inject(HttpClient);
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser = isPlatformBrowser(this.platformId);
 
   private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -37,7 +40,9 @@ export class AuthService {
         const userToStore = { ...user };
         delete userToStore.password;
 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(userToStore));
+        if (this.isBrowser) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(userToStore));
+        }
 
         this.currentUserSubject.next(userToStore);
       }),
@@ -53,7 +58,9 @@ export class AuthService {
    * Clears user data from localStorage and resets the current user state
    */
   logout(): void {
-    localStorage.removeItem(STORAGE_KEY);
+    if (this.isBrowser) {
+      localStorage.removeItem(STORAGE_KEY);
+    }
     this.currentUserSubject.next(null);
   }
 
@@ -87,6 +94,10 @@ export class AuthService {
    * @returns User object or null if not found or invalid
    */
   private getUserFromStorage(): User | null {
+    if (!this.isBrowser) {
+      return null;
+    }
+
     try {
       const userJson = localStorage.getItem(STORAGE_KEY);
       if (!userJson) {
