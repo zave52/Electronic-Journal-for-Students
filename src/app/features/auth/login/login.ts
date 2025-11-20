@@ -29,7 +29,6 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // If user is already logged in, redirect to their dashboard
     if (this.authService.isLoggedIn()) {
       this.redirectBasedOnRole();
     }
@@ -54,6 +53,7 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
       return;
     }
 
@@ -72,8 +72,31 @@ export class LoginComponent implements OnInit {
       },
       error: (error: Error) => {
         this.isLoading.set(false);
-        this.errorMessage.set(error.message || 'Login failed. Please try again.');
+        this.errorMessage.set('Incorrect email or password');
       }
     });
+  }
+
+  getEmailError(): string | null {
+    const emailControl = this.loginForm.get('email');
+    if (!emailControl?.touched) return null;
+
+    if (emailControl.hasError('required')) {
+      return 'Field is required';
+    }
+    if (emailControl.hasError('email')) {
+      return 'Enter a valid email';
+    }
+    return null;
+  }
+
+  getPasswordError(): string | null {
+    const passwordControl = this.loginForm.get('password');
+    if (!passwordControl?.touched) return null;
+
+    if (passwordControl.hasError('required')) {
+      return 'Field is required';
+    }
+    return null;
   }
 }
