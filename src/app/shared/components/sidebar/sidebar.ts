@@ -1,12 +1,14 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AuthService } from '../../../core';
 
 interface NavLink {
   label: string;
   path: string;
   icon: string;
-  roles?: string[];
+  roles: string[];
 }
 
 @Component({
@@ -17,7 +19,16 @@ interface NavLink {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Sidebar {
-  navLinks: NavLink[] = [
+  private authService = inject(AuthService);
+
+  currentUser = toSignal(this.authService.currentUser$, { initialValue: null });
+
+  userRole = computed(() => {
+    const user = this.currentUser();
+    return user?.role?.toLowerCase() || null;
+  });
+
+  private adminLinks: NavLink[] = [
     {
       label: 'Dashboard',
       path: '/admin/dashboard',
@@ -35,13 +46,19 @@ export class Sidebar {
       path: '/admin/courses',
       icon: 'courses',
       roles: ['admin']
-    },
+    }
+  ];
+
+  private teacherLinks: NavLink[] = [
     {
       label: 'My Courses',
       path: '/teacher/courses',
       icon: 'courses',
       roles: ['teacher']
-    },
+    }
+  ];
+
+  private studentLinks: NavLink[] = [
     {
       label: 'My Courses',
       path: '/student/courses',
@@ -61,4 +78,23 @@ export class Sidebar {
       roles: ['student']
     }
   ];
+
+  navLinks = computed(() => {
+    const role = this.userRole();
+
+    if (!role) {
+      return [];
+    }
+
+    switch (role) {
+      case 'admin':
+        return this.adminLinks;
+      case 'teacher':
+        return this.teacherLinks;
+      case 'student':
+        return this.studentLinks;
+      default:
+        return [];
+    }
+  });
 }
