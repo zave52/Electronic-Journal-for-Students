@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../core';
 
 @Component({
@@ -14,7 +15,7 @@ export class Header {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  currentUser = computed(() => this.authService.getCurrentUser());
+  currentUser = toSignal(this.authService.currentUser$, { initialValue: null });
   userName = computed(() => {
     const user = this.currentUser();
     return user ? user.name : 'Guest';
