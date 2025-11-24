@@ -1,11 +1,55 @@
-<header class="bg-white shadow-sm border-b border-gray-200">
-  <div class="flex items-center justify-between px-6 py-4">
+<header class="bg-white shadow-md">
+  <div class="flex items-center justify-between px-4 py-4 md:px-6">
     <div class="flex items-center gap-4">
-      <h2 class="text-xl font-semibold text-gray-800">Electronic Journal</h2>
+      <button
+        (click)="toggleMobileMenu()"
+        class="lg:hidden p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        aria-label="Toggle menu"
+      >
+        <svg
+          class="w-6 h-6 text-gray-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+      </button>
+
+      <h1 class="text-lg md:text-xl font-semibold text-gray-800">
+        Electronic Journal
+      </h1>
     </div>
-    <div class="flex items-center gap-4">
-      <button class="text-gray-600 hover:text-gray-900">
-        Profile
+
+    <div class="flex items-center gap-3 md:gap-4">
+      <span class="text-sm md:text-base text-gray-700 font-medium">
+        {{ userName() }}
+      </span>
+
+      <button
+        (click)="logout()"
+        class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+        title="Logout"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+          />
+        </svg>
+        <span class="hidden sm:inline">Logout</span>
       </button>
     </div>
   </div>
