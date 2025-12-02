@@ -3,19 +3,19 @@ import { HttpClient } from '@angular/common/http';
 import { switchMap, forkJoin } from 'rxjs';
 import { AuthService } from '../../../core';
 import { Router } from '@angular/router';
+import {environment} from '../../../../environments/environment';
 
 @Injectable()
 class LocalCourseService {
-  private apiUrl = 'http://localhost:3000';
 
   constructor(private http: HttpClient) {}
 
   getCoursesByStudent(studentId: number) {
-    return this.http.get<any[]>(`${this.apiUrl}/enrollments?studentId=${studentId}`)
+    return this.http.get<any[]>(`${environment}/enrollments?studentId=${studentId}`)
       .pipe(
         switchMap(enrollments => {
           const requests = enrollments.map(e =>
-            this.http.get(`${this.apiUrl}/courses/${e.courseId}`)
+            this.http.get(`${environment}/courses/${e.courseId}`)
           );
           return forkJoin(requests);
         })
