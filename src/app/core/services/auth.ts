@@ -89,6 +89,18 @@ export class AuthService {
     return user ? user.role : null;
   }
 
+  getCurrentUserId(): number {
+    const user = localStorage.getItem('currentUser');
+
+    if (!user) return 0;
+
+    try {
+      return JSON.parse(user).id;
+    } catch (e) {
+      return 0;
+    }
+  }
+
   /**
    * Private helper method to retrieve and parse user data from localStorage
    * @returns User object or null if not found or invalid
