@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, EMPTY } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
+import {environment} from '../../../environments/environment';
 
 interface Course {
   description: string;
@@ -19,13 +20,12 @@ interface Enrollment {
   providedIn: 'root'
 })
 export class CourseService {
-  private apiUrl = 'http://localhost:3000';
 
   constructor(private http: HttpClient) {}
 
 
   getCoursesByStudentId(studentId: number): Observable<Course[]> {
-    return this.http.get<Enrollment[]>(`${this.apiUrl}/enrollments?studentId=${studentId}`).pipe(
+    return this.http.get<Enrollment[]>(`${environment}/enrollments?studentId=${studentId}`).pipe(
       map(enrollments => enrollments.map(e => e.courseId)),
 
       switchMap(courseIds => {
@@ -36,7 +36,7 @@ export class CourseService {
 
         const courseQueries = courseIds.map(id => `id=${id}`).join('&');
 
-        return this.http.get<Course[]>(`${this.apiUrl}/courses?${courseQueries}`);
+        return this.http.get<Course[]>(`${environment}/courses?${courseQueries}`);
       })
     );
   }
