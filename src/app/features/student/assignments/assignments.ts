@@ -36,7 +36,7 @@ export class Assignments implements OnInit {
     if (lessonId > 0) {
       this.loadAssignments(lessonId);
     } else {
-      this.error = 'Помилка: Lesson ID не визначено внутрішньо.';
+      this.error = 'Lesson id not found.';
     }
 
   }
@@ -51,14 +51,14 @@ export class Assignments implements OnInit {
           this.assignments = data;
         } else {
           this.assignments = [];
-          this.error = 'Завдання знайдено, але список порожній.';
+          this.error = 'Task found, but list is empty.';
         }
         this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading assignments:', err);
         console.error(`Attempted URL: ${this.API_BASE_URL}/assignments?lessonId=${lessonId}`);
-        this.error = 'Не вдалося завантажити завдання. Перевірте консоль та доступність API.';
+        this.error = 'Task dont not found.';
         this.isLoading = false;
       }
     });

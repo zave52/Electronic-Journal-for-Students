@@ -12,7 +12,7 @@
   <ul *ngIf="assignments.length > 0" class="assignment-list">
     <li *ngFor="let assignment of assignments" class="assignment-item">
       <h3>{{ assignment.title }}</h3>
-      <p class="deadline">Дедлайн: {{ assignment.deadline | date:'medium' }}</p>
+      <p class="deadline">Deadline: {{ assignment.deadline | date:'medium' }}</p>
       <p class="instructions">{{ assignment.instructions }}</p>
     </li>
   </ul>
