@@ -1,12 +1,32 @@
-<h2>My Courses</h2>
+<div class="courses-page-container">
+  <h1 class="page-title"> My Courses</h1>
+  <hr class="header-separator">
 
-<div *ngIf="courses.length === 0">
-  <p>Now You are not have any courses</p>
+  <div *ngIf="courses.length === 0" class="empty-state">
+    <h2>You Are Not Currently Enrolled in Any Courses</h2>
+    <p>Please contact the administrator or use the "Course Catalog" menu to start learning.</p>
+  </div>
+
+  <div *ngIf="courses.length > 0" class="courses-grid">
+
+    <div
+      *ngFor="let course of courses"
+      class="course-card"
+      (click)="openCourse(course.id)">
+
+      <div class="card-header">
+        <span class="status-tag">Active</span>
+      </div>
+
+      <div class="card-body">
+        <h3>{{ course.title }}</h3>
+
+        <p class="description">{{ course.description }}</p>
+      </div>
+
+      <div class="card-footer">
+        <a class="course-link">Go to Course →</a>
+      </div>
+    </div>
+  </div>
 </div>
-
-<ul *ngIf="courses.length > 0">
-  <li *ngFor="let course of courses" (click)="openCourse(course.id)">
-    <h3>{{ course.title }}</h3>
-    <p>{{ course.description }}</p>
-  </li>
-</ul>
