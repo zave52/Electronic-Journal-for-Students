@@ -1,2 +1,12 @@
-<h2>My Courses!</h2>
+<h2>My Courses</h2>
 
+<div *ngIf="courses.length === 0">
+  <p>Now You are not have any courses</p>
+</div>
+
+<ul *ngIf="courses.length > 0">
+  <li *ngFor="let course of courses" (click)="openCourse(course.id)">
+    <h3>{{ course.title }}</h3>
+    <p>{{ course.description }}</p>
+  </li>
+</ul>

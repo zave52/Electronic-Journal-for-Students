@@ -4,6 +4,7 @@ import { switchMap, forkJoin } from 'rxjs';
 import { AuthService } from '../../../core';
 import { Router } from '@angular/router';
 import {environment} from '../../../../environments/environment';
+import {NgForOf, NgIf} from '@angular/common';
 
 @Injectable()
 class LocalCourseService {
@@ -11,11 +12,11 @@ class LocalCourseService {
   constructor(private http: HttpClient) {}
 
   getCoursesByStudent(studentId: number) {
-    return this.http.get<any[]>(`${environment}/enrollments?studentId=${studentId}`)
+    return this.http.get<any[]>(`${environment.apiUrl}/enrollments?studentId=${studentId}`)
       .pipe(
         switchMap(enrollments => {
           const requests = enrollments.map(e =>
-            this.http.get(`${environment}/courses/${e.courseId}`)
+            this.http.get(`${environment.apiUrl}/courses/${e.courseId}`)
           );
           return forkJoin(requests);
         })
@@ -28,6 +29,10 @@ class LocalCourseService {
   standalone: true,
   providers: [LocalCourseService],
   templateUrl: './courses.html',
+  imports: [
+    NgForOf,
+    NgIf
+  ],
   styleUrls: ['./courses.css']
 })
 export class Courses implements OnInit {

@@ -25,23 +25,23 @@ export class CourseService {
 
 
   getCoursesByStudentId(studentId: number): Observable<Course[]> {
-    return this.http.get<Enrollment[]>(`${environment}/enrollments?studentId=${studentId}`).pipe(
+    return this.http.get<Enrollment[]>(`${environment.apiUrl}/enrollments?studentId=${studentId}`).pipe(
       map(enrollments => enrollments.map(e => e.courseId)),
       switchMap(courseIds => {
         if (courseIds.length === 0) {
           return EMPTY;
         }
         const q = courseIds.map(id => `id=${id}`).join('&');
-        return this.http.get<Course[]>(`${environment}/courses?${q}`);
+        return this.http.get<Course[]>(`${environment.apiUrl}/courses?${q}`);
       })
     );
   }
 
   getCourseById(courseId: number): Observable<Course> {
-    return this.http.get<Course>(`${environment}/courses/${courseId}`);
+    return this.http.get<Course>(`${environment.apiUrl}/courses/${courseId}`);
   }
 
   getLessonsByCourseId(courseId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${environment}/lessons?courseId=${courseId}`);
+    return this.http.get<any[]>(`${environment.apiUrl}/lessons?courseId=${courseId}`);
   }
 }
