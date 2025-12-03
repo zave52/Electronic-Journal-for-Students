@@ -1,31 +1,46 @@
-<h2>My Grades</h2>
+<div class="grades-page-container">
+  <h1> Grades Journal</h1>
+  <hr class="header-separator">
 
-<div *ngIf="loading">
-  <p>Downloading of grades...</p>
-</div>
-
-<div *ngIf="error" class="alert-error">
-  <p>{{ error }}</p>
-</div>
-
-<div *ngIf="grades$ | async as grades">
-
-  <div *ngIf="grades.length === 0 && !loading && !error" class="empty-state">
-    <p>You dont have a grades</p>
+  <div class="loading-state" *ngIf="loading">
+    <p>Loading data...</p>
   </div>
 
-  <ul class="grades-list">
-    <li *ngFor="let gradeItem of grades" class="grade-item">
-      <div class="grade-info">
-        <strong>Task:</strong> {{ gradeItem.assignmentId }}
-      </div>
-      <div class="grade-score">
-        <strong>Grades:</strong> <span>{{ gradeItem.grade }}</span>
-      </div>
-      <div class="course-id">
-        Course: {{ gradeItem.courseId }}
-      </div>
-    </li>
-  </ul>
+  <div class="alert-error" *ngIf="error">
+    Error: {{ error }}
+  </div>
 
+  <div *ngIf="grades$ | async as grades">
+
+    <div *ngIf="grades.length === 0 && !loading && !error" class="empty-state">
+      <h2>⚠️ No Grades Recorded Yet</h2>
+      <p>Please check with your instructor if you are expecting results.</p>
+    </div>
+
+    <div *ngIf="grades.length > 0" class="grades-grid">
+
+      <div *ngFor="let gradeItem of grades" class="grade-card">
+
+        <div class="card-header">
+          <span class="course-tag">Course #{{ gradeItem.courseId }}</span>
+
+          <span
+            class="grade-indicator grade-level-{{ gradeItem.grade > 89 ? 'high' : (gradeItem.grade > 74 ? 'medium' : 'low') }}">
+                {{ gradeItem.grade }}
+            </span>
+        </div>
+
+        <div class="card-body">
+          <h3>Assignment ID: {{ gradeItem.assignmentId }}</h3>
+          <p class="grade-description">
+            Final score for the completed assignment.
+          </p>
+          <div class="grade-details">
+            <span>Grade ID: {{ gradeItem.id }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 </div>
