@@ -1,1 +1,31 @@
-<p>grades works!</p>
+<h2>My Grades</h2>
+
+<div *ngIf="loading">
+  <p>Downloading of grades...</p>
+</div>
+
+<div *ngIf="error" class="alert-error">
+  <p>{{ error }}</p>
+</div>
+
+<div *ngIf="grades$ | async as grades">
+
+  <div *ngIf="grades.length === 0 && !loading && !error" class="empty-state">
+    <p>You dont have a grades</p>
+  </div>
+
+  <ul class="grades-list">
+    <li *ngFor="let gradeItem of grades" class="grade-item">
+      <div class="grade-info">
+        <strong>Task:</strong> {{ gradeItem.assignmentId }}
+      </div>
+      <div class="grade-score">
+        <strong>Grades:</strong> <span>{{ gradeItem.grade }}</span>
+      </div>
+      <div class="course-id">
+        Course: {{ gradeItem.courseId }}
+      </div>
+    </li>
+  </ul>
+
+</div>

@@ -1,0 +1,56 @@
+
+.grades-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.course-group {
+  margin-bottom: 30px;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.course-name {
+  color: #007bff; /* Яскравий колір для назви курсу */
+  margin-top: 0;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+}
+
+.assignment-list {
+  list-style: none;
+  padding: 0;
+}
+
+.assignment-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px dotted #ccc;
+}
+
+.assignment-name {
+  flex-grow: 1;
+}
+
+.assignment-score strong {
+  color: #28a745; /* Зелений для оцінок */
+  font-size: 1.1em;
+}
+
+/* Порожній стан */
+.empty-state {
+  text-align: center;
+  padding: 50px 20px;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  color: #6c757d;
+}
+
+.empty-message h2 {
+  color: #343a40;
+}
