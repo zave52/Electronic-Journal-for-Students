@@ -3,6 +3,7 @@ import { LoginComponent } from './features/auth/login/login';
 import { NotFound } from './features/auth/not-found/not-found';
 import { Layout } from './shared/components/layout/layout';
 import { authGuard, roleGuard } from './core';
+import {StudentCourseDetailsPageComponent} from './features/student/course-details/course-details';
 
 export const routes: Routes = [
   {
@@ -75,7 +76,7 @@ export const routes: Routes = [
           },
           {
             path: 'courses/:id',
-            loadComponent: () => import('./features/student/course-details/course-details').then(m => m.CourseDetails)
+            loadComponent: () => import('./features/student/course-details/course-details').then(m => m.StudentCourseDetailsPageComponent)
           },
           {
             path: 'grades',
