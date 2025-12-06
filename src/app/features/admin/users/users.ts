@@ -30,8 +30,16 @@ export class Users implements OnInit {
   }
 
   onDelete(user: User): void {
-    // TODO: Implement delete functionality
-    console.log('Delete user:', user);
+    const confirmed = confirm(`Are you sure you want to delete user "${user.name}"?`);
+
+    if (confirmed && user.id) {
+      this.userService.deleteUser(user.id).subscribe({
+        next: () => {
+          this.users.update(users => users.filter(u => u.id !== user.id));
+        },
+        error: (error) => console.error('Error deleting user:', error)
+      });
+    }
   }
 
   onCreateUser(): void {
