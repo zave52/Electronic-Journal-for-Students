@@ -1,15 +1,111 @@
-.title {
-  font-size: 28px;
-  margin-bottom: 20px;
+.courses-page-container {
+  padding: 30px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.courses-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+.page-title {
+  color: #2c3e50;
+  font-size: 2em;
+  font-weight: 600;
+}
+
+.header-separator {
+  border: 0;
+  height: 1px;
+  background: #ecf0f1;
+  margin: 20px 0 30px 0;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
 }
 
 .course-card {
-  width: 300px;
+  background: #ffffff;
+  border: 1px solid #dcdcdc;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  padding: 15px 20px;
+  background-color: #eaf6ff;
+  border-bottom: 1px solid #d0e4f8;
+}
+
+.status-tag {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: #007bff;
+  padding: 3px 8px;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+}
+
+.card-body {
+  padding: 20px;
+  flex-grow: 1;
+}
+
+.card-body h3 {
+  margin-top: 0;
+  color: #34495e;
+  font-size: 1.4em;
+  margin-bottom: 10px;
+}
+
+.card-body .description {
+  color: #7f8c8d;
+  font-size: 0.95em;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #eeeeee;
+  text-align: right;
+}
+
+.course-link {
+  color: #007bff;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.course-link:hover {
+  color: #0056b3;
+}
+
+.empty-state {
+  padding: 40px;
+  text-align: center;
+  border-radius: 8px;
+  background-color: #fff8e1;
+  border: 1px solid #ffecb3;
+  color: #6d4c41;
+}
+
+.empty-state h2 {
+  color: #fbc02d;
+  margin-top: 0;
 }
