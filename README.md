@@ -15,10 +15,10 @@ An Angular Single Page Application with three user roles (Admin, Teacher, Studen
 npm install
 
 # Start Angular dev server
-ng serve
+ng serve # or npm start
 
 # Start json-server (in another terminal)
-npm run json-server
+npm run api
 ```
 
 App runs at `http://localhost:4200` | Mock API at `http://localhost:3000`
@@ -169,4 +169,3 @@ Students view academic progress and track assignments.
 - **Responsiveness:** Fully functional on desktop, tablet, and mobile
 - **Performance:** Fast loading, smooth interactions
 - **Compatibility:** Latest versions of major browsers
-
