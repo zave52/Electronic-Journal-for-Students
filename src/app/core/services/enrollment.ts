@@ -23,7 +23,7 @@ export class EnrollmentService {
     return this.http.post<Enrollment>(this.apiUrl, enrollment);
   }
 
-  deleteEnrollment(id: number): Observable<void> {
+  deleteEnrollment(id: number | string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
