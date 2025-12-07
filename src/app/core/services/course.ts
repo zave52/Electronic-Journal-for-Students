@@ -1,14 +1,9 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, EMPTY } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import {environment} from '../../../environments/environment';
-
-interface Course {
-  description: string;
-  id: number;
-  title: string;
-}
+import { environment } from '../../../environments/environment';
+import { Course } from '../models';
 
 interface Enrollment {
   id: number;
@@ -20,9 +15,28 @@ interface Enrollment {
   providedIn: 'root'
 })
 export class CourseService {
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/courses`;
 
-  constructor(private http: HttpClient) {}
+  getCourses(): Observable<Course[]> {
+    return this.http.get<Course[]>(this.apiUrl);
+  }
 
+  getCourseById(courseId: number): Observable<Course> {
+    return this.http.get<Course>(`${this.apiUrl}/${courseId}`);
+  }
+
+  createCourse(course: Partial<Course>): Observable<Course> {
+    return this.http.post<Course>(this.apiUrl, course);
+  }
+
+  updateCourse(course: Partial<Course>): Observable<Course> {
+    return this.http.put<Course>(`${this.apiUrl}/${course.id}`, course);
+  }
+
+  deleteCourse(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 
   getCoursesByStudentId(studentId: number): Observable<Course[]> {
     return this.http.get<Enrollment[]>(`${environment.apiUrl}/enrollments?studentId=${studentId}`).pipe(
@@ -32,13 +46,9 @@ export class CourseService {
           return EMPTY;
         }
         const q = courseIds.map(id => `id=${id}`).join('&');
-        return this.http.get<Course[]>(`${environment.apiUrl}/courses?${q}`);
+        return this.http.get<Course[]>(`${this.apiUrl}?${q}`);
       })
     );
-  }
-
-  getCourseById(courseId: number): Observable<Course> {
-    return this.http.get<Course>(`${environment.apiUrl}/courses/${courseId}`);
   }
 
   getLessonsByCourseId(courseId: number): Observable<any[]> {
