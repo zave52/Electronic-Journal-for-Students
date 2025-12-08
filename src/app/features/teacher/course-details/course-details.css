@@ -1,0 +1,66 @@
+.teacher-course-details-container {
+  min-height: calc(100vh - 200px);
+  overflow: visible;
+}
+
+.tabs-container button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tabs-container button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.tabs-container button:active {
+  transform: translateY(1px);
+}
+
+.tab-content {
+  animation: fadeIn 0.3s ease-in;
+  overflow: visible !important;
+  box-shadow: none !important;
+  min-height: 0;
+  height: auto;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.empty-state {
+  padding: 3rem 1rem;
+}
+
+.gradebook-tab {
+  overflow: visible !important;
+  height: auto;
+  min-height: 0;
+}
+
+@media (max-width: 640px) {
+  .tabs-container nav {
+    flex-direction: column;
+    space-x: 0;
+  }
+
+  .tabs-container button {
+    width: 100%;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    border-left: 3px solid transparent;
+  }
+
+  .tabs-container button.border-blue-500 {
+    border-left-color: #3b82f6;
+    border-bottom-color: #e5e7eb;
+  }
+}
