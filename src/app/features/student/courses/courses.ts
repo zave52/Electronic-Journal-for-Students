@@ -1,10 +1,11 @@
 import { Component, Inject, Injectable, OnInit, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin, switchMap } from 'rxjs';
+import { forkJoin, Observable, of, switchMap } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { AuthService } from '../../../core';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
-import { isPlatformBrowser, NgForOf, NgIf } from '@angular/common';
+import { CommonModule, isPlatformBrowser, NgForOf, NgIf } from '@angular/common';
 
 @Injectable()
 class LocalCourseService {
@@ -16,10 +17,21 @@ class LocalCourseService {
     return this.http.get<any[]>(`${environment.apiUrl}/enrollments?studentId=${studentId}`)
       .pipe(
         switchMap(enrollments => {
+          if (!enrollments || enrollments.length === 0) {
+            return of([]);
+          }
+
           const requests = enrollments.map(e =>
-            this.http.get(`${environment.apiUrl}/courses/${e.courseId}`)
+            this.http.get(`${environment.apiUrl}/courses/${e.courseId}`).pipe(
+              catchError(err => {
+                console.error('Error fetching course:', e.courseId, err);
+                return of(null);
+              })
+            )
           );
-          return forkJoin(requests);
+          return forkJoin(requests).pipe(
+            map(courses => courses.filter(c => c !== null))
+          );
         })
       );
   }
@@ -32,13 +44,16 @@ class LocalCourseService {
   templateUrl: './courses.html',
   imports: [
     NgForOf,
-    NgIf
+    NgIf,
+    CommonModule
   ],
   styleUrls: ['./courses.css']
 })
 export class Courses implements OnInit {
 
-  courses: any[] = [];
+  courses$!: Observable<any[]>;
+  loading = false;
+  error: string | null = null;
 
   constructor(
     private localService: LocalCourseService,
@@ -55,13 +70,22 @@ export class Courses implements OnInit {
 
     const id = this.auth.getCurrentUserId();
 
-    this.localService.getCoursesByStudent(id).subscribe(courses => {
-      this.courses = courses;
-    });
+    this.loading = true;
+    this.courses$ = this.localService.getCoursesByStudent(id).pipe(
+      catchError(err => {
+        console.error('Error loading courses:', err);
+        this.error = 'Failed to load courses';
+        return of([]);
+      }),
+      map(courses => {
+        this.loading = false;
+        return courses || [];
+      })
+    );
   }
 
-  openCourse(id: number) {
-    this.router.navigate(['/student/courses', id]);
+  openCourse(id: number | string) {
+    this.router.navigate(['/student/courses', Number(id)]);
   }
 }
 

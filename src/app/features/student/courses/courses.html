@@ -2,30 +2,39 @@
   <h1 class="page-title"> My Courses</h1>
   <hr class="header-separator">
 
-  <div *ngIf="courses.length === 0" class="empty-state">
-    <h2>You Are Not Currently Enrolled in Any Courses</h2>
-    <p>Please contact the administrator or use the "Course Catalog" menu to start learning.</p>
+  <div *ngIf="loading" class="loading-state">
+    <p>Loading courses...</p>
   </div>
 
-  <div *ngIf="courses.length > 0" class="courses-grid">
+  <div *ngIf="error" class="error-state text-red-600">
+    <p>{{ error }}</p>
+  </div>
 
-    <div
-      *ngFor="let course of courses"
-      class="course-card"
-      (click)="openCourse(course.id)">
+  <div *ngIf="courses$ | async as courses">
+    <div *ngIf="courses.length === 0 && !loading && !error" class="empty-state">
+      <h2>You Are Not Currently Enrolled in Any Courses</h2>
+      <p>Please contact the administrator or use the "Course Catalog" menu to start learning.</p>
+    </div>
 
-      <div class="card-header">
-        <span class="status-tag">Active</span>
-      </div>
+    <div *ngIf="courses.length > 0" class="courses-grid">
+      <div
+        *ngFor="let course of courses"
+        class="course-card"
+        (click)="openCourse(course.id)">
 
-      <div class="card-body">
-        <h3>{{ course.title }}</h3>
+        <div class="card-header">
+          <span class="status-tag">Active</span>
+        </div>
 
-        <p class="description">{{ course.description }}</p>
-      </div>
+        <div class="card-body">
+          <h3>{{ course.name }}</h3>
 
-      <div class="card-footer">
-        <a class="course-link">Go to Course →</a>
+          <p class="description">{{ course.description }}</p>
+        </div>
+
+        <div class="card-footer">
+          <a class="course-link">Go to Course →</a>
+        </div>
       </div>
     </div>
   </div>
