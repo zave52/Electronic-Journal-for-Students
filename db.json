@@ -123,19 +123,45 @@
   ],
   "enrollments": [
     {
-      "id": "fed2",
+      "id": "1",
       "courseId": 2,
       "studentId": 4
     },
     {
-      "id": "0bc2",
+      "id": "2",
       "courseId": 2,
       "studentId": 5
     },
     {
-      "id": "aac1",
+      "id": "3",
       "courseId": 1,
       "studentId": 4
+    }
+  ],
+  "assignmentStatuses": [
+    {
+      "id": "1",
+      "studentId": 4,
+      "assignmentId": 1,
+      "completed": true
+    },
+    {
+      "id": "2",
+      "studentId": 4,
+      "assignmentId": 2,
+      "completed": true
+    },
+    {
+      "id": "3",
+      "studentId": 4,
+      "assignmentId": 3,
+      "completed": true
+    },
+    {
+      "id": "4",
+      "studentId": 5,
+      "assignmentId": 1,
+      "completed": false
     }
   ]
 }

@@ -1,16 +1,17 @@
 import { Component, Inject, Input, OnChanges, OnInit, PLATFORM_ID, SimpleChanges } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, switchMap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Assignment } from '../../../core/models/assignment.model';
+import { AuthService, StudentTask, StudentTaskService } from '../../../core';
 
 @Component({
   selector: 'app-assignments',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './assignments.html',
   styleUrls: ['./assignments.css']
 })
@@ -18,16 +19,21 @@ export class Assignments implements OnInit, OnChanges {
 
   @Input() lessonId?: number | null;
 
-  assignments$!: Observable<Assignment[]>;
+  assignments$!: Observable<StudentTask[]>;
   isLoading = false;
   error: string | null = null;
+  private currentStudentId: number | null = null;
+  private gradedAssignmentIds = new Set<number>();
 
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
+    private taskService: StudentTaskService,
+    private authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
   }
+
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['lessonId'] && this.lessonId != null && isPlatformBrowser(this.platformId)) {
@@ -37,6 +43,15 @@ export class Assignments implements OnInit, OnChanges {
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    // Get current student ID
+    const currentUser = this.authService.getCurrentUser();
+    this.currentStudentId = currentUser?.id || null;
+
+    if (!this.currentStudentId) {
+      this.error = 'Unable to determine current user';
       return;
     }
 
@@ -52,21 +67,64 @@ export class Assignments implements OnInit, OnChanges {
   }
 
   private loadData(): void {
+    if (!this.currentStudentId) {
+      return;
+    }
+
     this.isLoading = true;
     this.error = null;
 
-    const request$ = this.lessonId && this.lessonId > 0
-      ? this.getAssignmentsByLessonId(this.lessonId)
-      : this.getAllAssignments();
+    // Fetch grades first to populate gradedAssignmentIds, then fetch assignments
+    this.assignments$ = this.http.get<any[]>(`${environment.apiUrl}/grades?studentId=${this.currentStudentId}`).pipe(
+      switchMap(grades => {
+        // Populate gradedAssignmentIds
+        this.gradedAssignmentIds.clear();
+        grades.forEach(grade => {
+          this.gradedAssignmentIds.add(Number(grade.assignmentId));
+        });
 
-    this.assignments$ = request$.pipe(
+        // Use StudentTaskService to get assignments with completion status
+        return this.taskService.getAllAssignmentsForStudent(this.currentStudentId!);
+      }),
       catchError(err => {
         console.error('Error loading assignments:', err);
         this.error = 'Failed to load assignments. Check the console and API availability.';
-        return of([] as Assignment[]);
+        return of([] as StudentTask[]);
       }),
-      finalize(() => (this.isLoading = false))
+      finalize(() => {
+        this.isLoading = false;
+      })
     );
+  }
+
+  toggleCompletion(task: StudentTask): void {
+    if (!this.currentStudentId) {
+      return;
+    }
+
+    // Prevent unchecking assignments that have grades
+    if (this.hasGrade(task)) {
+      return;
+    }
+
+    this.taskService.toggleTaskCompletion(
+      this.currentStudentId,
+      task.id,
+      task.statusId,
+      task.completed
+    ).subscribe({
+      next: () => {
+        this.loadData();
+      },
+      error: (err) => {
+        console.error('Error toggling task completion:', err);
+        this.error = 'Failed to update task status';
+      }
+    });
+  }
+
+  hasGrade(task: StudentTask): boolean {
+    return this.gradedAssignmentIds.has(task.id);
   }
 
   getAssignmentsByLessonId(lessonId: number): Observable<Assignment[]> {
@@ -76,5 +134,4 @@ export class Assignments implements OnInit, OnChanges {
   getAllAssignments(): Observable<Assignment[]> {
     return this.http.get<Assignment[]>(`${environment.apiUrl}/assignments`);
   }
-
 }
