@@ -1,0 +1,7 @@
+.course-info-tab-container {
+  @apply bg-white rounded-lg shadow-sm p-6;
+}
+
+.form-group {
+  @apply mb-4;
+}
