@@ -84,5 +84,13 @@
       </tbody>
     </table>
   </div>
+
+  @if (showModal()) {
+    <app-user-form
+      [user]="selectedUser()"
+      (save)="onSaveUser($event)"
+      (cancel)="closeModal()">
+    </app-user-form>
+  }
 </div>
 
