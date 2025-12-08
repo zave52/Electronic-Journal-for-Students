@@ -1,15 +1,16 @@
-import { Injectable, Component, OnInit } from '@angular/core';
+import { Component, Inject, Injectable, OnInit, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { switchMap, forkJoin } from 'rxjs';
+import { forkJoin, switchMap } from 'rxjs';
 import { AuthService } from '../../../core';
 import { Router } from '@angular/router';
-import {environment} from '../../../../environments/environment';
-import {NgForOf, NgIf} from '@angular/common';
+import { environment } from '../../../../environments/environment';
+import { isPlatformBrowser, NgForOf, NgIf } from '@angular/common';
 
 @Injectable()
 class LocalCourseService {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+  }
 
   getCoursesByStudent(studentId: number) {
     return this.http.get<any[]>(`${environment.apiUrl}/enrollments?studentId=${studentId}`)
@@ -42,10 +43,16 @@ export class Courses implements OnInit {
   constructor(
     private localService: LocalCourseService,
     private auth: AuthService,
-    private router: Router
-  ) {}
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+  }
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     const id = this.auth.getCurrentUserId();
 
     this.localService.getCoursesByStudent(id).subscribe(courses => {

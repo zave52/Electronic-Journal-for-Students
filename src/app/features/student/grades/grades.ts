@@ -1,10 +1,9 @@
-
-import { Component, OnInit } from '@angular/core';
-import { GradeService } from '../../../core';
-import { AuthService } from '../../../core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { AuthService, GradeService } from '../../../core';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { CommonModule } from '@angular/common';
+import { catchError, finalize } from 'rxjs/operators';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Grade } from '../../../core/models/grade.model';
 
 @Component({
   selector: 'app-my-grades',
@@ -15,16 +14,21 @@ import { CommonModule } from '@angular/common';
 })
 export class Grades implements OnInit {
 
-  grades$!: Observable<any[]>;
-  loading: boolean = true;
+  grades$!: Observable<Grade[]>;
+  loading = false;
   error: string | null = null;
 
   constructor(
     private gradeService: GradeService,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+  }
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
     this.fetchStudentGrades();
   }
 
@@ -32,10 +36,11 @@ export class Grades implements OnInit {
     this.loading = true;
     this.error = null;
 
-    const currentStudentId = this.authService.getCurrentUserId();
+    const currentUser = this.authService.getCurrentUser?.() ?? (this.authService as any).getCurrentUser?.();
+    const currentStudentId = currentUser?.id ?? (this.authService as any).getCurrentUserId?.();
 
     if (!currentStudentId) {
-      this.error = 'Помилка: Не вдалося отримати ID поточного користувача.';
+      this.error = 'Error: Unable to determine current user id.';
       this.loading = false;
       this.grades$ = of([]);
       return;
@@ -43,17 +48,11 @@ export class Grades implements OnInit {
 
     this.grades$ = this.gradeService.getGradesByStudentId(currentStudentId).pipe(
       catchError(err => {
-        console.error('Помилка завантаження оцінок:', err);
-        this.error = 'Не вдалося завантажити оцінки. Перевірте JSON Server.';
-        this.loading = false;
-        return of([]);
-      })
+        console.error('Failed to load grades:', err);
+        this.error = 'Failed to load grades. Please check JSON Server or your network connection.';
+        return of([] as Grade[]);
+      }),
+      finalize(() => (this.loading = false))
     );
-
-    this.grades$.subscribe({
-      next: () => this.loading = false,
-      error: () => this.loading = false,
-      complete: () => this.loading = false
-    });
   }
 }
