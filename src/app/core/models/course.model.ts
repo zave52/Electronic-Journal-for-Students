@@ -4,6 +4,4 @@ export interface Course {
   description?: string;
   syllabus?: string;
   teacherId: number;
-  studentIds: number[];
 }
-

@@ -1,9 +1,10 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Course, User } from '../../../core/models';
-import { CourseService, UserService } from '../../../core/services';
+import { Course, Enrollment, User } from '../../../core/models';
+import { CourseService, EnrollmentService, UserService } from '../../../core/services';
 import { CourseFormComponent } from '../../../shared/components/course-form/course-form';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-courses',
@@ -14,10 +15,12 @@ import { CourseFormComponent } from '../../../shared/components/course-form/cour
 export class Courses implements OnInit {
   private courseService = inject(CourseService);
   private userService = inject(UserService);
+  private enrollmentService = inject(EnrollmentService);
   private router = inject(Router);
 
   courses = signal<Course[]>([]);
   users = signal<User[]>([]);
+  enrollments = signal<Enrollment[]>([]);
   showModal = signal(false);
   selectedCourse = signal<Course | null>(null);
   isLoading = signal(false);
@@ -36,10 +39,11 @@ export class Courses implements OnInit {
 
   loadData(): void {
     this.isLoading.set(true);
+
     this.userService.getUsers().subscribe({
       next: (users) => {
         this.users.set(users);
-        this.loadCourses();
+        this.loadCoursesAndEnrollments();
       },
       error: (error) => {
         console.error('Error loading users:', error);
@@ -48,19 +52,27 @@ export class Courses implements OnInit {
     });
   }
 
-  loadCourses(): void {
-    this.courseService.getCourses().subscribe({
-      next: (courses) => {
+  private loadCoursesAndEnrollments(): void {
+    forkJoin({
+      courses: this.courseService.getCourses(),
+      enrollments: this.enrollmentService.getAllEnrollments()
+    }).subscribe({
+      next: ({ courses, enrollments }) => {
         console.log('Loaded courses:', courses);
-        console.log('Available users:', this.users());
+        console.log('Loaded enrollments:', enrollments);
         this.courses.set(courses);
+        this.enrollments.set(enrollments);
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading courses:', error);
+        console.error('Error loading data:', error);
         this.isLoading.set(false);
       }
     });
+  }
+
+  getStudentCount(courseId: number): number {
+    return this.enrollments().filter(e => Number(e.courseId) === Number(courseId)).length;
   }
 
   onEdit(course: Course): void {
@@ -95,7 +107,7 @@ export class Courses implements OnInit {
       this.courseService.updateCourse(courseData).subscribe({
         next: () => {
           this.closeModal();
-          this.loadCourses();
+          this.loadCoursesAndEnrollments();
         },
         error: (error) => console.error('Error updating course:', error)
       });
@@ -103,7 +115,7 @@ export class Courses implements OnInit {
       this.courseService.createCourse(courseData).subscribe({
         next: () => {
           this.closeModal();
-          this.loadCourses();
+          this.loadCoursesAndEnrollments();
         },
         error: (error) => console.error('Error creating course:', error)
       });
