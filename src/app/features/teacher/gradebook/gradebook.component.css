@@ -1,0 +1,57 @@
+.gradebook-container {
+  max-width: 100%;
+}
+
+.gradebook-content {
+  position: relative;
+}
+
+table {
+  border-spacing: 0;
+}
+
+th.sticky {
+  position: sticky;
+  z-index: 20;
+}
+
+td.sticky {
+  position: sticky;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input:disabled {
+  cursor: not-allowed;
+}
+
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+  height: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
