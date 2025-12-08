@@ -6,7 +6,7 @@ import { Course } from '../../../core/models';
 import { finalize } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-course-info-tab',
+  selector: 'app-course-info',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './course-info.component.html',
