@@ -1,4 +1,14 @@
-import { Component, Inject, Input, OnInit, PLATFORM_ID } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  Inject,
+  Input,
+  OnChanges,
+  OnInit,
+  PLATFORM_ID,
+  SimpleChanges
+} from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, of } from 'rxjs';
@@ -22,7 +32,7 @@ interface GradeCell {
   templateUrl: './gradebook.component.html',
   styleUrls: ['./gradebook.component.css']
 })
-export class GradebookComponent implements OnInit {
+export class GradebookComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() courseId!: number;
 
   students: any[] = [];
@@ -31,11 +41,18 @@ export class GradebookComponent implements OnInit {
   loading = false;
   error: string | null = null;
   savingCells: Set<string> = new Set();
+  changedCells: Set<string> = new Set();
+  invalidCells: Set<string> = new Set();
+  validationMessages: Map<string, string> = new Map();
+  private hasLoaded = false;
+  isSavingAll = false;
+  saveMessage: string | null = null;
 
   constructor(
     private courseService: CourseService,
     private gradeService: GradeService,
     private http: HttpClient,
+    private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
   }
@@ -49,13 +66,27 @@ export class GradebookComponent implements OnInit {
       this.error = 'Course ID is required';
       return;
     }
+  }
 
-    this.loadGradebook();
+  ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId) && !this.hasLoaded && this.courseId) {
+      setTimeout(() => {
+        this.loadGradebook();
+      }, 0);
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['courseId'] && !changes['courseId'].firstChange && isPlatformBrowser(this.platformId)) {
+      this.hasLoaded = false;
+      this.loadGradebook();
+    }
   }
 
   loadGradebook(): void {
     this.loading = true;
     this.error = null;
+    this.hasLoaded = true;
 
     forkJoin({
       enrollments: this.http.get<any[]>(`${environment.apiUrl}/enrollments?courseId=${this.courseId}`).pipe(
@@ -76,6 +107,7 @@ export class GradebookComponent implements OnInit {
           this.assignments = assignments.sort((a: any, b: any) => a.id - b.id);
           this.buildGradeMatrix(grades);
           this.loading = false;
+          this.cdr.markForCheck();
           return;
         }
 
@@ -91,18 +123,19 @@ export class GradebookComponent implements OnInit {
             this.assignments = assignments.sort((a: any, b: any) => a.id - b.id);
             this.buildGradeMatrix(grades);
             this.loading = false;
+            this.cdr.detectChanges();
           },
           error: (err: any) => {
-            console.error('Error loading students:', err);
             this.error = 'Failed to load student data';
             this.loading = false;
+            this.cdr.detectChanges();
           }
         });
       },
       error: (err: any) => {
-        console.error('Error loading gradebook:', err);
         this.error = 'Failed to load gradebook data';
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -123,14 +156,54 @@ export class GradebookComponent implements OnInit {
       });
     });
 
+    const gradesByKey = new Map<string, any[]>();
+
     grades.forEach(grade => {
       const key = this.getCellKey(Number(grade.studentId), Number(grade.assignmentId));
+      if (!gradesByKey.has(key)) {
+        gradesByKey.set(key, []);
+      }
+      gradesByKey.get(key)!.push(grade);
+    });
+
+    const duplicatesToDelete: number[] = [];
+
+    gradesByKey.forEach((gradesForCell, key) => {
       const cell = this.gradeMatrix.get(key);
-      if (cell) {
+      if (!cell) return;
+
+      if (gradesForCell.length > 1) {
+
+        gradesForCell.sort((a, b) => {
+          const idA = typeof a.id === 'string' ? parseInt(a.id, 16) : a.id;
+          const idB = typeof b.id === 'string' ? parseInt(b.id, 16) : b.id;
+          return idB - idA;
+        });
+
+        const keepGrade = gradesForCell[0];
+        cell.grade = keepGrade.grade;
+        cell.gradeId = Number(keepGrade.id) || keepGrade.id;
+
+        for (let i = 1; i < gradesForCell.length; i++) {
+          duplicatesToDelete.push(gradesForCell[i].id);
+        }
+      } else {
+        const grade = gradesForCell[0];
         cell.grade = grade.grade;
-        cell.gradeId = Number(grade.id);
+        cell.gradeId = Number(grade.id) || grade.id;
       }
     });
+
+    if (duplicatesToDelete.length > 0) {
+      duplicatesToDelete.forEach(gradeId => {
+        this.gradeService.deleteGrade(gradeId).subscribe({
+          next: () => { /* duplicate deleted */
+          },
+          error: () => { /* ignore delete errors */
+          }
+        });
+      });
+    }
   }
 
   getCellKey(studentId: number, assignmentId: number): string {
@@ -145,90 +218,160 @@ export class GradebookComponent implements OnInit {
     const cell = this.getGradeCell(studentId, assignmentId);
     if (!cell) return;
 
+    const cellKey = this.getCellKey(studentId, assignmentId);
     const gradeValue = value.trim();
+
+    this.validationMessages.delete(cellKey);
+    this.invalidCells.delete(cellKey);
+
     if (gradeValue === '') {
       cell.grade = null;
+      this.changedCells.add(cellKey);
       return;
     }
 
     const numericGrade = Number(gradeValue);
-    if (isNaN(numericGrade) || numericGrade < 0 || numericGrade > 100) {
+
+    if (isNaN(numericGrade)) {
+      this.invalidCells.add(cellKey);
+      this.validationMessages.set(cellKey, 'Grade must be a number');
+      return;
+    }
+
+    if (numericGrade < 0) {
+      this.invalidCells.add(cellKey);
+      this.validationMessages.set(cellKey, 'Grade cannot be negative');
+      return;
+    }
+
+    if (numericGrade > 100) {
+      this.invalidCells.add(cellKey);
+      this.validationMessages.set(cellKey, 'Grade cannot exceed 100');
       return;
     }
 
     cell.grade = numericGrade;
+    this.changedCells.add(cellKey);
   }
 
-  onGradeBlur(studentId: number, assignmentId: number): void {
-    const cell = this.getGradeCell(studentId, assignmentId);
-    if (!cell) return;
-
-    const cellKey = this.getCellKey(studentId, assignmentId);
-
-    if (this.savingCells.has(cellKey)) {
+  saveAllChanges(): void {
+    if (this.invalidCells.size > 0) {
+      this.saveMessage = `Cannot save: ${this.invalidCells.size} cell(s) have invalid grades. Please fix the errors.`;
+      setTimeout(() => this.saveMessage = null, 5000);
       return;
     }
 
-    this.savingCells.add(cellKey);
+    if (this.changedCells.size === 0) {
+      this.saveMessage = 'No changes to save.';
+      setTimeout(() => this.saveMessage = null, 3000);
+      return;
+    }
 
-    if (cell.grade !== null) {
-      if (cell.gradeId) {
-        this.gradeService.updateGrade({
-          id: cell.gradeId,
-          studentId: cell.studentId,
-          assignmentId: cell.assignmentId,
-          courseId: cell.courseId,
-          grade: cell.grade
-        }).subscribe({
-          next: (updatedGrade: any) => {
-            console.log('Grade updated:', updatedGrade);
-            this.savingCells.delete(cellKey);
-          },
-          error: (err: any) => {
-            console.error('Error updating grade:', err);
-            this.savingCells.delete(cellKey);
-            alert('Failed to update grade. Please try again.');
-          }
-        });
-      } else {
-        this.gradeService.createGrade({
-          studentId: cell.studentId,
-          assignmentId: cell.assignmentId,
-          courseId: cell.courseId,
-          grade: cell.grade
-        }).subscribe({
-          next: (newGrade: any) => {
-            console.log('Grade created:', newGrade);
-            cell.gradeId = Number(newGrade.id);
-            this.savingCells.delete(cellKey);
-          },
-          error: (err: any) => {
-            console.error('Error creating grade:', err);
-            this.savingCells.delete(cellKey);
-            alert('Failed to save grade. Please try again.');
-          }
+    this.isSavingAll = true;
+    this.saveMessage = null;
+    const saveRequests: Array<{ request: any; cellKey: string; isCreate: boolean }> = [];
+
+    this.changedCells.forEach(cellKey => {
+      const [studentId, assignmentId] = cellKey.split('-').map(Number);
+      const cell = this.getGradeCell(studentId, assignmentId);
+
+      if (!cell) return;
+
+      if (cell.grade !== null && cell.grade !== undefined) {
+        if (cell.gradeId) {
+          saveRequests.push({
+            request: this.gradeService.updateGrade({
+              id: cell.gradeId,
+              studentId: cell.studentId,
+              assignmentId: cell.assignmentId,
+              courseId: cell.courseId,
+              grade: cell.grade
+            }).pipe(
+              catchError(() => of(null))
+            ),
+            cellKey,
+            isCreate: false
+          });
+        } else {
+          saveRequests.push({
+            request: this.gradeService.createGrade({
+              studentId: cell.studentId,
+              assignmentId: cell.assignmentId,
+              courseId: cell.courseId,
+              grade: cell.grade
+            }).pipe(
+              catchError(() => of(null))
+            ),
+            cellKey,
+            isCreate: true
+          });
+        }
+      } else if (cell.gradeId) {
+        saveRequests.push({
+          request: this.gradeService.deleteGrade(cell.gradeId).pipe(
+            catchError(() => of(null))
+          ),
+          cellKey,
+          isCreate: false
         });
       }
-    } else if (cell.gradeId) {
-      this.gradeService.deleteGrade(cell.gradeId).subscribe({
-        next: () => {
-          console.log('Grade deleted');
-          cell.gradeId = null;
-          this.savingCells.delete(cellKey);
-        },
-        error: (err: any) => {
-          console.error('Error deleting grade:', err);
-          this.savingCells.delete(cellKey);
-          alert('Failed to delete grade. Please try again.');
-        }
-      });
-    } else {
-      this.savingCells.delete(cellKey);
+    });
+
+    if (saveRequests.length === 0) {
+      this.isSavingAll = false;
+      this.changedCells.clear();
+      return;
     }
+
+    forkJoin(saveRequests.map(req => req.request)).subscribe({
+      next: (results: any[]) => {
+
+        results.forEach((result, index) => {
+          if (result && result.id && saveRequests[index].isCreate) {
+            const cellKey = saveRequests[index].cellKey;
+            const [studentId, assignmentId] = cellKey.split('-').map(Number);
+            const cell = this.getGradeCell(studentId, assignmentId);
+
+            if (cell) {
+              cell.gradeId = Number(result.id);
+            }
+          }
+        });
+
+        this.changedCells.clear();
+        this.isSavingAll = false;
+        this.saveMessage = '✓ All changes saved successfully!';
+        setTimeout(() => this.saveMessage = null, 3000);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isSavingAll = false;
+        this.saveMessage = '✗ Failed to save some grades. Please try again.';
+        setTimeout(() => this.saveMessage = null, 5000);
+        this.cdr.detectChanges();
+      }
+    });
   }
 
-  isSaving(studentId: number, assignmentId: number): boolean {
-    return this.savingCells.has(this.getCellKey(studentId, assignmentId));
+  hasChanges(): boolean {
+    return this.changedCells.size > 0;
+  }
+
+  hasInvalidGrades(): boolean {
+    return this.invalidCells.size > 0;
+  }
+
+  getValidationMessage(studentId: number, assignmentId: number): string | null {
+    const cellKey = this.getCellKey(studentId, assignmentId);
+    return this.validationMessages.get(cellKey) || null;
+  }
+
+  isInvalid(studentId: number, assignmentId: number): boolean {
+    return this.invalidCells.has(this.getCellKey(studentId, assignmentId));
+  }
+
+  isChanged(studentId: number, assignmentId: number): boolean {
+    return this.changedCells.has(this.getCellKey(studentId, assignmentId));
   }
 
   getAverageForStudent(studentId: number): number | null {

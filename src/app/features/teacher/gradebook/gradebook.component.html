@@ -1,4 +1,4 @@
-<div class="gradebook-container p-6">
+<div class="gradebook-container p-6" style="overflow: visible !important; height: auto;">
   <h2 class="text-2xl font-bold mb-6">Gradebook</h2>
 
   <div *ngIf="loading" class="loading-state text-center py-8">
@@ -10,6 +10,41 @@
   </div>
 
   <div *ngIf="!loading && !error" class="gradebook-content">
+    <div class="mb-4 flex items-center justify-between">
+      <div>
+        <button
+          (click)="saveAllChanges()"
+          [disabled]="isSavingAll || (!hasChanges() && !hasInvalidGrades())"
+          class="px-6 py-2 rounded font-medium transition-colors"
+          [class.bg-blue-600]="hasChanges() && !hasInvalidGrades()"
+          [class.text-white]="hasChanges() && !hasInvalidGrades()"
+          [class.hover:bg-blue-700]="hasChanges() && !hasInvalidGrades() && !isSavingAll"
+          [class.bg-gray-300]="!hasChanges() || hasInvalidGrades() || isSavingAll"
+          [class.text-gray-500]="!hasChanges() || hasInvalidGrades() || isSavingAll"
+          [class.cursor-not-allowed]="!hasChanges() || hasInvalidGrades() || isSavingAll">
+          <span *ngIf="!isSavingAll">💾 Save Changes</span>
+          <span *ngIf="isSavingAll">Saving...</span>
+          <span *ngIf="hasChanges() && !hasInvalidGrades()" class="ml-2 text-sm">({{ changedCells.size }})</span>
+        </button>
+        <span *ngIf="hasChanges() && !hasInvalidGrades()" class="ml-3 text-sm text-gray-600">
+          {{ changedCells.size }} unsaved change(s)
+        </span>
+        <span *ngIf="hasInvalidGrades()" class="ml-3 text-sm text-red-600">
+          ⚠ {{ invalidCells.size }} invalid grade(s) - fix errors before saving
+        </span>
+      </div>
+      <div *ngIf="saveMessage"
+           class="px-4 py-2 rounded"
+           [class.bg-green-100]="saveMessage.includes('✓')"
+           [class.text-green-800]="saveMessage.includes('✓')"
+           [class.bg-red-100]="saveMessage.includes('✗') || saveMessage.includes('Cannot')"
+           [class.text-red-800]="saveMessage.includes('✗') || saveMessage.includes('Cannot')"
+           [class.bg-gray-100]="!saveMessage.includes('✓') && !saveMessage.includes('✗') && !saveMessage.includes('Cannot')"
+           [class.text-gray-800]="!saveMessage.includes('✓') && !saveMessage.includes('✗') && !saveMessage.includes('Cannot')">
+        {{ saveMessage }}
+      </div>
+    </div>
+
     <div *ngIf="students.length === 0 || assignments.length === 0" class="empty-state text-center py-8">
       <p class="text-gray-600">
         <span *ngIf="students.length === 0">No students enrolled in this course.</span>
@@ -17,7 +52,8 @@
       </p>
     </div>
 
-    <div *ngIf="students.length > 0 && assignments.length > 0" class="overflow-x-auto shadow-md rounded-lg">
+    <div *ngIf="students.length > 0 && assignments.length > 0" class="table-wrapper shadow-md rounded-lg"
+         style="overflow-x: auto; overflow-y: visible;">
       <table class="min-w-full bg-white border-collapse">
         <thead class="bg-gray-100 sticky top-0">
         <tr>
@@ -50,26 +86,26 @@
           </td>
           <td *ngFor="let assignment of assignments"
               class="px-4 py-3 text-center border-b border-gray-200 relative">
-            <input
-              type="number"
-              min="0"
-              max="100"
-              [value]="getGradeCell(student.id, assignment.id)?.grade ?? ''"
-              (input)="onGradeChange(student.id, assignment.id, $any($event.target).value)"
-              (blur)="onGradeBlur(student.id, assignment.id)"
-              [disabled]="isSaving(student.id, assignment.id)"
-              class="w-full px-2 py-1 text-center border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-              [class.border-gray-300]="!getGradeCell(student.id, assignment.id)?.grade"
-              [class.border-green-500]="getGradeCell(student.id, assignment.id)?.grade! >= 90"
-              [class.border-blue-500]="getGradeCell(student.id, assignment.id)?.grade! >= 75 && getGradeCell(student.id, assignment.id)?.grade! < 90"
-              [class.border-yellow-500]="getGradeCell(student.id, assignment.id)?.grade! >= 60 && getGradeCell(student.id, assignment.id)?.grade! < 75"
-              [class.border-red-500]="getGradeCell(student.id, assignment.id)?.grade! < 60"
-              placeholder="—"
-            />
-            <span *ngIf="isSaving(student.id, assignment.id)"
-                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-500 text-xs">
-                💾
-              </span>
+            <div class="relative">
+              <input
+                type="number"
+                min="0"
+                max="100"
+                [value]="getGradeCell(student.id, assignment.id)?.grade ?? ''"
+                (input)="onGradeChange(student.id, assignment.id, $any($event.target).value)"
+                class="w-full px-2 py-1 text-center border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                [class.border-gray-300]="!isInvalid(student.id, assignment.id) && !isChanged(student.id, assignment.id)"
+                [class.border-red-500]="isInvalid(student.id, assignment.id)"
+                [class.bg-red-50]="isInvalid(student.id, assignment.id)"
+                [class.border-yellow-400]="isChanged(student.id, assignment.id) && !isInvalid(student.id, assignment.id)"
+                [class.bg-yellow-50]="isChanged(student.id, assignment.id) && !isInvalid(student.id, assignment.id)"
+                placeholder="—"
+              />
+              <div *ngIf="getValidationMessage(student.id, assignment.id)"
+                   class="absolute left-0 right-0 top-full mt-1 text-xs text-red-600 bg-red-50 border border-red-200 rounded px-2 py-1 z-10 whitespace-nowrap">
+                {{ getValidationMessage(student.id, assignment.id) }}
+              </div>
+            </div>
           </td>
           <td class="px-4 py-3 text-center border-b border-gray-200 font-semibold bg-blue-50">
               <span [class.text-green-700]="getAverageForStudent(student.id)! >= 90"
@@ -89,9 +125,14 @@
       <h3 class="text-sm font-semibold text-gray-700 mb-2">Grading Instructions:</h3>
       <ul class="text-sm text-gray-600 space-y-1">
         <li>• Enter grades from 0 to 100</li>
-        <li>• Grades are saved automatically when you leave the field</li>
+        <li>• Changed cells will be highlighted in <span
+          class="bg-yellow-50 px-2 py-0.5 border border-yellow-400 rounded">yellow</span></li>
+        <li>• Invalid grades will show in <span class="bg-red-50 px-2 py-0.5 border border-red-500 rounded">red</span>
+          with error messages
+        </li>
+        <li>• Click the <span class="font-semibold">"💾 Save Changes"</span> button to save all modifications</li>
         <li>• Leave empty to remove a grade</li>
-        <li>• Color coding: <span class="text-green-700 font-semibold">90-100</span>,
+        <li>• Average colors: <span class="text-green-700 font-semibold">90-100</span>,
           <span class="text-blue-700 font-semibold">75-89</span>,
           <span class="text-yellow-700 font-semibold">60-74</span>,
           <span class="text-red-700 font-semibold">&lt;60</span>
@@ -100,4 +141,3 @@
     </div>
   </div>
 </div>
-
