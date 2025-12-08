@@ -7,3 +7,4 @@ export * from './services/course';
 export * from './services/lesson';
 export * from './services/assignment';
 export * from './services/grade';
+export * from './services/student-task';

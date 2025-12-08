@@ -5,3 +5,4 @@ export * from './lesson';
 export * from './assignment';
 export * from './grade';
 export * from './enrollment';
+export * from './student-task';
