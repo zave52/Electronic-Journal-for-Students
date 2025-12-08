@@ -1,56 +1,122 @@
-
-.grades-container {
-  max-width: 800px;
+.grades-page-container {
+  padding: 30px 40px;
+  max-width: 1200px;
   margin: 0 auto;
+}
+
+h1 {
+  color: #2c3e50;
+  font-size: 2em;
+  font-weight: 600;
+}
+
+.header-separator {
+  border: 0;
+  height: 1px;
+  background: #ecf0f1;
+  margin: 20px 0 30px 0;
+}
+
+.grades-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.grade-card {
+  background: #ffffff;
+  border: 1px solid #dcdcdc;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.grade-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.course-tag {
+  font-size: 0.9em;
+  font-weight: 500;
+  color: #7f8c8d;
+  padding: 4px 10px;
+  background-color: #e8f0fe;
+  border-radius: 4px;
+}
+
+.grade-indicator {
+  font-size: 1.5em;
+  font-weight: bold;
+  padding: 8px 15px;
+  border-radius: 8px;
+  color: white;
+  min-width: 50px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.grade-level-high {
+  background-color: #2ecc71;
+}
+.grade-level-medium {
+  background-color: #3498db;
+}
+.grade-level-low {
+  background-color: #e74c3c;
+}
+
+
+.card-body {
   padding: 20px;
 }
 
-.course-group {
-  margin-bottom: 30px;
-  padding: 15px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+.card-body h3 {
+  margin-top: 0;
+  color: #34495e;
+  font-size: 1.3em;
+  margin-bottom: 10px;
 }
 
-.course-name {
-  color: #007bff; /* Яскравий колір для назви курсу */
-  margin-top: 0;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 5px;
+.grade-description {
+  color: #95a5a6;
+  font-size: 0.95em;
   margin-bottom: 15px;
 }
 
-.assignment-list {
-  list-style: none;
-  padding: 0;
+.grade-details span {
+  display: block;
+  font-size: 0.85em;
+  color: #bdc3c7;
+  margin-top: 5px;
 }
 
-.assignment-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px dotted #ccc;
-}
-
-.assignment-name {
-  flex-grow: 1;
-}
-
-.assignment-score strong {
-  color: #28a745; /* Зелений для оцінок */
+.loading-state, .empty-state, .alert-error {
+  padding: 30px;
+  text-align: center;
+  border-radius: 8px;
+  margin-top: 20px;
   font-size: 1.1em;
 }
 
-/* Порожній стан */
 .empty-state {
-  text-align: center;
-  padding: 50px 20px;
-  border: 2px dashed #ccc;
-  border-radius: 10px;
-  color: #6c757d;
+  background-color: #f0f4f7;
+  border: 1px solid #d9e2e9;
+  color: #607d8b;
 }
 
-.empty-message h2 {
-  color: #343a40;
+.alert-error {
+  background-color: #fbe4e4;
+  border: 1px solid #f09595;
+  color: #c0392b;
 }
