@@ -67,7 +67,7 @@
     <div class="tab-content bg-white rounded-lg border border-gray-200 p-6"
          style="overflow: visible !important; height: auto !important; max-height: none !important;">
       <div *ngIf="isActiveTab('information')" class="information-tab" style="overflow: visible !important;">
-        <app-course-info-tab [course]="course"></app-course-info-tab>
+        <app-course-info [course]="course"></app-course-info>
       </div>
 
       <div *ngIf="isActiveTab('lessons')" class="lessons-tab" style="overflow: visible !important;">

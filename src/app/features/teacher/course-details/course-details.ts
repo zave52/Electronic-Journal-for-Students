@@ -6,7 +6,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { CourseService } from '../../../core';
 import { Course } from '../../../core/models';
 import { GradebookComponent } from '../gradebook/gradebook.component';
-import { CourseInfoComponent } from '../course-info-tab/course-info.component';
+import { CourseInfoComponent } from '../course-info/course-info.component';
 
 type TabName = 'information' | 'lessons' | 'gradebook';
 
