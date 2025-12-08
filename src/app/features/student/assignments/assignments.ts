@@ -1,66 +1,80 @@
-
-import { Component, OnInit, Injectable } from '@angular/core';
+import { Component, Inject, Input, OnChanges, OnInit, PLATFORM_ID, SimpleChanges } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { Assignment } from '../../../core/models/assignment.model';
 
 @Component({
   selector: 'app-assignments',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './assignments.html',
-  styleUrl: './assignments.css',
+  styleUrls: ['./assignments.css']
 })
-@Injectable({
-  providedIn: 'root'
-})
-export class Assignments implements OnInit {
+export class Assignments implements OnInit, OnChanges {
 
-  assignments: any[] = [];
-  isLoading: boolean = false;
+  @Input() lessonId?: number | null;
+
+  assignments$!: Observable<Assignment[]>;
+  isLoading = false;
   error: string | null = null;
 
-  private API_BASE_URL: string = (environment as any).apiUrl || 'http://localhost:3000';
+  constructor(
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+  }
 
-  private static readonly HARDCODED_LESSON_ID = 1;
-
-  constructor(private http: HttpClient) {}
-
-  getAssignmentsByLessonId(lessonId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.API_BASE_URL}/assignments?lessonId=${lessonId}`);
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['lessonId'] && this.lessonId != null && isPlatformBrowser(this.platformId)) {
+      this.loadData();
+    }
   }
 
   ngOnInit(): void {
-    const lessonId = Assignments.HARDCODED_LESSON_ID;
-
-    if (lessonId > 0) {
-      this.loadAssignments(lessonId);
-    } else {
-      this.error = 'Помилка: Lesson ID не визначено внутрішньо.';
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
     }
 
+    if (this.lessonId == null) {
+      const param = this.route.snapshot.paramMap.get('lessonId');
+      const parsed = param ? Number(param) : NaN;
+      if (!Number.isNaN(parsed) && parsed > 0) {
+        this.lessonId = parsed;
+      }
+    }
+
+    this.loadData();
   }
 
-  loadAssignments(lessonId: number): void {
+  private loadData(): void {
     this.isLoading = true;
     this.error = null;
 
-    this.getAssignmentsByLessonId(lessonId).subscribe({
-      next: (data) => {
-        if (data && data.length > 0) {
-          this.assignments = data;
-        } else {
-          this.assignments = [];
-          this.error = 'Завдання знайдено, але список порожній.';
-        }
-        this.isLoading = false;
-      },
-      error: (err) => {
+    const request$ = this.lessonId && this.lessonId > 0
+      ? this.getAssignmentsByLessonId(this.lessonId)
+      : this.getAllAssignments();
+
+    this.assignments$ = request$.pipe(
+      catchError(err => {
         console.error('Error loading assignments:', err);
-        console.error(`Attempted URL: ${this.API_BASE_URL}/assignments?lessonId=${lessonId}`);
-        this.error = 'Не вдалося завантажити завдання. Перевірте консоль та доступність API.';
-        this.isLoading = false;
-      }
-    });
+        this.error = 'Failed to load assignments. Check the console and API availability.';
+        return of([] as Assignment[]);
+      }),
+      finalize(() => (this.isLoading = false))
+    );
   }
+
+  getAssignmentsByLessonId(lessonId: number): Observable<Assignment[]> {
+    return this.http.get<Assignment[]>(`${environment.apiUrl}/assignments?lessonId=${lessonId}`);
+  }
+
+  getAllAssignments(): Observable<Assignment[]> {
+    return this.http.get<Assignment[]>(`${environment.apiUrl}/assignments`);
+  }
+
 }

@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CourseService } from '../../../core';
 import { Assignments } from '../assignments/assignments';
-import { DatePipe} from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-course-details',
@@ -18,10 +18,16 @@ export class StudentCourseDetailsPageComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private courseService: CourseService,
-    private assignmentService: Assignments
-  ) {}
+    private assignmentService: Assignments,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+  }
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.loadCourse(id);
   }

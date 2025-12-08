@@ -1,19 +1,26 @@
 <div class="assignments-list-container">
-  <h2>Task</h2>
+  <h2 class="text-xl font-semibold">Assignments</h2>
 
-  <div *ngIf="error" class="state-message error">
+  <div *ngIf="isLoading" class="state-message loading">
+    <p>Loading assignments...</p>
+  </div>
+
+  <div *ngIf="error" class="state-message error text-red-600">
     <p>Error: {{ error }}</p>
   </div>
 
-  <div *ngIf="!isLoading && assignments.length === 0 && !error" class="empty-state">
-    <p>You dont have task</p>
-  </div>
+  <div *ngIf="assignments$ | async as assignments">
+    <div *ngIf="assignments.length === 0 && !isLoading && !error" class="empty-state text-gray-600">
+      <p>You don't have any assignments.</p>
+    </div>
 
-  <ul *ngIf="assignments.length > 0" class="assignment-list">
-    <li *ngFor="let assignment of assignments" class="assignment-item">
-      <h3>{{ assignment.title }}</h3>
-      <p class="deadline">Дедлайн: {{ assignment.deadline | date:'medium' }}</p>
-      <p class="instructions">{{ assignment.instructions }}</p>
-    </li>
-  </ul>
+    <ul *ngIf="assignments.length > 0" class="assignment-list" role="list">
+      <li *ngFor="let assignment of assignments" class="assignment-item mb-4 p-4 border rounded">
+        <h3 class="font-medium text-lg">{{ assignment.title }}</h3>
+        <p class="deadline text-sm text-gray-500">
+          Deadline: {{ assignment.deadline ? (assignment.deadline | date:'medium') : 'No deadline' }}</p>
+        <p class="instructions mt-2">{{ assignment.instructions }}</p>
+      </li>
+    </ul>
+  </div>
 </div>
