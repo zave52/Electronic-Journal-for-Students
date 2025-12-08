@@ -1,1 +1,196 @@
-<p>course-details works!</p>
+<div class="container mx-auto px-4 py-6">
+  <div class="mb-6">
+    <button
+      (click)="onBack()"
+      class="flex items-center text-blue-600 hover:text-blue-800 mb-4 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd"
+              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+              clip-rule="evenodd"/>
+      </svg>
+      Back to Courses
+    </button>
+
+    <h1 class="text-3xl font-bold text-gray-800">Course Details</h1>
+  </div>
+
+  @if (isLoading()) {
+    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+      <p class="text-gray-500">Loading course details...</p>
+    </div>
+  } @else if (course()) {
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ course()!.name }}</h2>
+
+      @if (course()!.description) {
+        <div class="mb-4">
+          <h3 class="text-sm font-medium text-gray-500 uppercase mb-2">Description</h3>
+          <p class="text-gray-700">{{ course()!.description }}</p>
+        </div>
+      }
+
+      @if (course()!.syllabus) {
+        <div class="mb-4">
+          <h3 class="text-sm font-medium text-gray-500 uppercase mb-2">Syllabus</h3>
+          <p class="text-gray-700 whitespace-pre-line">{{ course()!.syllabus }}</p>
+        </div>
+      }
+
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 uppercase mb-2">Enrolled Students</h3>
+        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+          {{ getEnrolledCount() }} students enrolled
+        </span>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">Student Enrollment</h2>
+
+      @if (students().length === 0) {
+        <p class="text-sm text-gray-500 italic">No students available in the system.</p>
+      } @else {
+        <div class="space-y-2">
+          @for (student of students(); track student.id) {
+            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+              <input
+                type="checkbox"
+                [id]="'student-' + student.id"
+                [checked]="isStudentEnrolled(Number(student.id))"
+                (change)="onEnrollmentChange(student, $event)"
+                [disabled]="isEnrolling() === Number(student.id)"
+                class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+
+              <label
+                [for]="'student-' + student.id"
+                class="ml-3 flex-1 text-sm font-medium text-gray-700 cursor-pointer">
+                {{ student.name }}
+                <span class="ml-2 text-xs text-gray-500">({{ student.email }})</span>
+              </label>
+
+              @if (isEnrolling() === Number(student.id)) {
+                <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                     viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              }
+            </div>
+          }
+        </div>
+
+        <p class="mt-4 text-sm text-gray-500">
+          Check or uncheck students to enroll/unenroll them from this course.
+        </p>
+      }
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">Teacher Assignment</h2>
+
+      <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+        <p class="text-sm text-gray-600 mb-1">Current Teacher</p>
+        <p class="text-lg font-medium text-gray-800">{{ currentTeacherName() }}</p>
+      </div>
+
+      @if (successMessage()) {
+        <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div class="flex items-center">
+            <svg class="h-5 w-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"/>
+            </svg>
+            <p class="text-green-800">{{ successMessage() }}</p>
+          </div>
+        </div>
+      }
+
+      @if (errorMessage()) {
+        <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div class="flex items-center">
+            <svg class="h-5 w-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clip-rule="evenodd"/>
+            </svg>
+            <p class="text-red-800">{{ errorMessage() }}</p>
+          </div>
+        </div>
+      }
+
+      <form [formGroup]="teacherForm" (ngSubmit)="onSaveTeacher()">
+        <div class="mb-4">
+          <label for="teacherId" class="block text-sm font-medium text-gray-700 mb-2">
+            Assign Teacher <span class="text-red-500">*</span>
+          </label>
+
+          @if (teachers().length === 0) {
+            <p class="text-sm text-gray-500 italic">No teachers available in the system.</p>
+          } @else {
+            <select
+              id="teacherId"
+              formControlName="teacherId"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option [value]="null">Select a teacher</option>
+              @for (teacher of teachers(); track teacher.id) {
+                <option [value]="teacher.id">{{ teacher.name }}</option>
+              }
+            </select>
+
+            @if (teacherForm.get('teacherId')?.invalid && teacherForm.get('teacherId')?.touched) {
+              <p class="mt-1 text-sm text-red-600">Please select a teacher</p>
+            }
+          }
+        </div>
+
+        <div class="flex gap-3">
+          <button
+            type="submit"
+            [disabled]="teacherForm.invalid || isSaving() || !isTeacherChanged()"
+            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2">
+            @if (isSaving()) {
+              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                   viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Saving...
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clip-rule="evenodd"/>
+              </svg>
+              Save Teacher Assignment
+            }
+          </button>
+
+          <button
+            type="button"
+            (click)="onBack()"
+            class="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors">
+            Cancel
+          </button>
+        </div>
+
+        @if (!isTeacherChanged() && !isSaving()) {
+          <p class="mt-2 text-sm text-gray-500 italic">
+            Select a different teacher to enable the save button
+          </p>
+        }
+      </form>
+    </div>
+  } @else {
+    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+      <p class="text-red-600 mb-4">Failed to load course details</p>
+      <button
+        (click)="onBack()"
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+        Back to Courses
+      </button>
+    </div>
+  }
+</div>

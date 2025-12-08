@@ -1,35 +1,35 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Admin User",
       "email": "admin@university.edu",
       "password": "admin123",
       "role": "admin"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Dr. John Smith",
       "email": "john.smith@university.edu",
       "password": "teacher123",
       "role": "teacher"
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Dr. Sarah Johnson",
       "email": "sarah.johnson@university.edu",
       "password": "teacher123",
       "role": "teacher"
     },
     {
-      "id": 4,
+      "id": "4",
       "name": "Alice Brown",
       "email": "alice.brown@student.edu",
       "password": "student123",
       "role": "student"
     },
     {
-      "id": 5,
+      "id": "5",
       "name": "Bob Wilson",
       "email": "bob.wilson@student.edu",
       "password": "student123",
@@ -38,37 +38,35 @@
   ],
   "courses": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Introduction to Computer Science",
       "description": "Fundamental concepts of computer science and programming",
       "syllabus": "Week 1: Introduction\nWeek 2: Variables and Data Types\nWeek 3: Control Structures",
-      "teacherId": 2,
-      "studentIds": [4, 5]
+      "teacherId": 2
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Web Development",
       "description": "Modern web development with HTML, CSS, and JavaScript",
       "syllabus": "Week 1: HTML Basics\nWeek 2: CSS Styling\nWeek 3: JavaScript Fundamentals",
-      "teacherId": 3,
-      "studentIds": [4]
+      "teacherId": 3
     }
   ],
   "lessons": [
     {
-      "id": 1,
+      "id": "1",
       "courseId": 1,
       "title": "Introduction to Programming",
       "description": "Learn the basics of programming concepts"
     },
     {
-      "id": 2,
+      "id": "2",
       "courseId": 1,
       "title": "Variables and Data Types",
       "description": "Understanding different types of data in programming"
     },
     {
-      "id": 3,
+      "id": "3",
       "courseId": 2,
       "title": "HTML Structure",
       "description": "Building web pages with HTML"
@@ -76,7 +74,7 @@
   ],
   "assignments": [
     {
-      "id": 1,
+      "id": "1",
       "lessonId": 1,
       "courseId": 1,
       "title": "Hello World Program",
@@ -84,7 +82,7 @@
       "deadline": "2025-11-05T23:59:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "lessonId": 2,
       "courseId": 1,
       "title": "Variable Exercise",
@@ -92,7 +90,7 @@
       "deadline": "2025-11-12T23:59:00Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "lessonId": 3,
       "courseId": 2,
       "title": "Build a Personal Page",
@@ -102,26 +100,42 @@
   ],
   "grades": [
     {
-      "id": 1,
+      "id": "1",
       "studentId": 4,
       "assignmentId": 1,
       "courseId": 1,
       "grade": 95
     },
     {
-      "id": 2,
+      "id": "2",
       "studentId": 5,
       "assignmentId": 1,
       "courseId": 1,
       "grade": 88
     },
     {
-      "id": 3,
+      "id": "3",
       "studentId": 4,
       "assignmentId": 3,
       "courseId": 2,
       "grade": 92
     }
+  ],
+  "enrollments": [
+    {
+      "id": "fed2",
+      "courseId": 2,
+      "studentId": 4
+    },
+    {
+      "id": "0bc2",
+      "courseId": 2,
+      "studentId": 5
+    },
+    {
+      "id": "aac1",
+      "courseId": 1,
+      "studentId": 4
+    }
   ]
 }
-

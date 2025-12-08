@@ -1,0 +1,97 @@
+<div
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+  <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+    <div class="flex items-center justify-between p-5 border-b border-gray-200">
+      <h3 class="text-xl font-semibold text-gray-900">
+        {{ isEditMode() ? 'Edit Course' : 'Create New Course' }}
+      </h3>
+      <button
+        (click)="onCancel()"
+        class="text-gray-400 hover:text-gray-600 transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6">
+      <div class="mb-4">
+        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+          Course Name <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          [class.border-red-500]="isFieldInvalid('name')"
+          placeholder="e.g., Introduction to Computer Science">
+        @if (isFieldInvalid('name')) {
+          <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('name') }}</p>
+        }
+      </div>
+
+      <div class="mb-4">
+        <label for="teacherId" class="block text-sm font-medium text-gray-700 mb-1">
+          Teacher <span class="text-red-500">*</span>
+        </label>
+        @if (isLoadingTeachers()) {
+          <p class="text-sm text-gray-500">Loading teachers...</p>
+        } @else {
+          <select
+            id="teacherId"
+            formControlName="teacherId"
+            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [class.border-red-500]="isFieldInvalid('teacherId')">
+            <option [value]="null">Select a teacher</option>
+            @for (teacher of teachers(); track teacher.id) {
+              <option [value]="teacher.id">{{ teacher.name }}</option>
+            }
+          </select>
+          @if (isFieldInvalid('teacherId')) {
+            <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('teacherId') }}</p>
+          }
+        }
+      </div>
+
+      <div class="mb-4">
+        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
+          Description
+        </label>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="3"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Brief description of the course"></textarea>
+      </div>
+
+      <div class="mb-6">
+        <label for="syllabus" class="block text-sm font-medium text-gray-700 mb-1">
+          Syllabus
+        </label>
+        <textarea
+          id="syllabus"
+          formControlName="syllabus"
+          rows="4"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Course syllabus and topics"></textarea>
+      </div>
+
+      <div class="flex justify-end gap-3">
+        <button
+          type="button"
+          (click)="onCancel()"
+          class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="form.invalid"
+          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
+          {{ isEditMode() ? 'Update' : 'Create' }} Course
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
