@@ -16,10 +16,35 @@
 
     <ul *ngIf="assignments.length > 0" class="assignment-list" role="list">
       <li *ngFor="let assignment of assignments" class="assignment-item mb-4 p-4 border rounded">
-        <h3 class="font-medium text-lg">{{ assignment.title }}</h3>
-        <p class="deadline text-sm text-gray-500">
-          Deadline: {{ assignment.deadline ? (assignment.deadline | date:'medium') : 'No deadline' }}</p>
-        <p class="instructions mt-2">{{ assignment.instructions }}</p>
+        <div class="flex items-start gap-3">
+          <input
+            type="checkbox"
+            [checked]="assignment.completed"
+            (change)="toggleCompletion(assignment)"
+            [disabled]="hasGrade(assignment)"
+            [class.cursor-pointer]="!hasGrade(assignment)"
+            [class.cursor-not-allowed]="hasGrade(assignment)"
+            [class.opacity-50]="hasGrade(assignment)"
+            class="mt-1 w-5 h-5"
+            [attr.aria-label]="'Mark ' + assignment.title + ' as ' + (assignment.completed ? 'incomplete' : 'complete')"
+            [title]="hasGrade(assignment) ? 'Cannot uncheck - assignment is graded' : ''"
+          />
+          <div class="flex-1">
+            <h3 class="font-medium text-lg" [class.line-through]="assignment.completed"
+                [class.text-gray-400]="assignment.completed">
+              {{ assignment.title }}
+            </h3>
+            <a
+              [routerLink]="['/student/courses', assignment.courseId]"
+              class="text-sm text-blue-600 hover:text-blue-800 hover:underline cursor-pointer mb-1 inline-block">
+              {{ assignment.courseName }}
+            </a>
+            <p class="deadline text-sm text-gray-500">
+              Deadline: {{ assignment.deadline ? (assignment.deadline | date:'medium') : 'No deadline' }}
+            </p>
+            <p class="instructions mt-2">{{ assignment.instructions }}</p>
+          </div>
+        </div>
       </li>
     </ul>
   </div>
