@@ -51,6 +51,10 @@ export class CourseService {
     );
   }
 
+  getCoursesByTeacherId(teacherId: number): Observable<Course[]> {
+    return this.http.get<Course[]>(`${this.apiUrl}?teacherId=${teacherId}`);
+  }
+
   getLessonsByCourseId(courseId: number): Observable<any[]> {
     return this.http.get<any[]>(`${environment.apiUrl}/lessons?courseId=${courseId}`);
   }
