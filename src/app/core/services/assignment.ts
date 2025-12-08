@@ -1,27 +1,68 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { environment} from '../../../environments/environment';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { Assignment, Lesson } from '../models';
 
 @Injectable({
   providedIn: 'root'
 })
-
-
 export class AssignmentService {
+  private http = inject(HttpClient);
+  private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) { }
+  getLessons(courseId: number): Observable<Lesson[]> {
+    return this.http.get<Lesson[]>(`${this.apiUrl}/lessons?courseId=${courseId}`);
+  }
+
+  getLessonById(lessonId: number): Observable<Lesson> {
+    return this.http.get<Lesson>(`${this.apiUrl}/lessons/${lessonId}`);
+  }
+
+  createLesson(lesson: Partial<Lesson>): Observable<Lesson> {
+    return this.http.post<Lesson>(`${this.apiUrl}/lessons`, lesson);
+  }
+
+  updateLesson(lesson: Partial<Lesson>): Observable<Lesson> {
+    return this.http.put<Lesson>(`${this.apiUrl}/lessons/${lesson.id}`, lesson);
+  }
+
+  deleteLesson(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/lessons/${id}`);
+  }
+
+  getAssignments(courseId: number): Observable<Assignment[]> {
+    return this.http.get<Assignment[]>(`${this.apiUrl}/assignments?courseId=${courseId}`);
+  }
+
+  getAssignmentsByLesson(lessonId: number): Observable<Assignment[]> {
+    return this.http.get<Assignment[]>(`${this.apiUrl}/assignments?lessonId=${lessonId}`);
+  }
+
+  getAssignmentById(assignmentId: number): Observable<Assignment> {
+    return this.http.get<Assignment>(`${this.apiUrl}/assignments/${assignmentId}`);
+  }
+
+  createAssignment(assignment: Partial<Assignment>): Observable<Assignment> {
+    return this.http.post<Assignment>(`${this.apiUrl}/assignments`, assignment);
+  }
+
+  updateAssignment(assignment: Partial<Assignment>): Observable<Assignment> {
+    return this.http.put<Assignment>(`${this.apiUrl}/assignments/${assignment.id}`, assignment);
+  }
+
+  deleteAssignment(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/assignments/${id}`);
+  }
 
   getAllAssignmentsForStudent(studentId: number): Observable<any[]> {
-    return this.http.get<any[]>(
-      `${environment.apiUrl}/assignments?studentId=${studentId}`
-    );
+    return this.http.get<any[]>(`${this.apiUrl}/assignments?studentId=${studentId}`);
   }
 
   updateTaskStatus(assignmentId: number, isCompleted: boolean): Observable<any> {
     return this.http.patch<any>(
-      `${environment.apiUrl}/assignments/${assignmentId}`,
-      {isCompleted: isCompleted}
+      `${this.apiUrl}/assignments/${assignmentId}`,
+      { isCompleted: isCompleted }
     );
   }
 }
