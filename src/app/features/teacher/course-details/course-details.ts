@@ -6,13 +6,14 @@ import { catchError, finalize } from 'rxjs/operators';
 import { CourseService } from '../../../core';
 import { Course } from '../../../core/models';
 import { GradebookComponent } from '../gradebook/gradebook.component';
+import { CourseInfoComponent } from '../course-info-tab/course-info.component';
 
 type TabName = 'information' | 'lessons' | 'gradebook';
 
 @Component({
   selector: 'app-course-details',
   standalone: true,
-  imports: [CommonModule, GradebookComponent],
+  imports: [CommonModule, GradebookComponent, CourseInfoComponent],
   templateUrl: './course-details.html',
   styleUrl: './course-details.css',
 })
