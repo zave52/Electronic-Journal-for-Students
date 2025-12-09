@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../core';
+import { MobileMenuService } from '../../services/mobile-menu.service';
 
 interface NavLink {
   label: string;
@@ -20,6 +21,7 @@ interface NavLink {
 })
 export class Sidebar {
   private authService = inject(AuthService);
+  private mobileMenuService = inject(MobileMenuService);
 
   currentUser = toSignal(this.authService.currentUser$, { initialValue: null });
 
@@ -97,4 +99,8 @@ export class Sidebar {
         return [];
     }
   });
+
+  onLinkClick(): void {
+    this.mobileMenuService.closeMenu();
+  }
 }
