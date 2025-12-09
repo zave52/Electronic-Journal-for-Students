@@ -8,11 +8,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Assignment } from '../../../core/models/assignment.model';
 import { AuthService, StudentTask, StudentTaskService } from '../../../core';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 
 @Component({
   selector: 'app-assignments',
   standalone: true,
-  imports: [CommonModule, RouterLink, LoaderComponent],
+  imports: [CommonModule, RouterLink, LoaderComponent, ErrorMessageComponent],
   templateUrl: './assignments.html',
   styleUrls: ['./assignments.css']
 })
@@ -126,6 +127,10 @@ export class Assignments implements OnInit, OnChanges {
 
   hasGrade(task: StudentTask): boolean {
     return this.gradedAssignmentIds.has(task.id);
+  }
+
+  retryLoad(): void {
+    this.loadData();
   }
 
   getAssignmentsByLessonId(lessonId: number): Observable<Assignment[]> {

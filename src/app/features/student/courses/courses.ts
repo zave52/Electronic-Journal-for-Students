@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { CommonModule, isPlatformBrowser, NgForOf, NgIf } from '@angular/common';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 
 @Injectable()
 class LocalCourseService {
@@ -47,7 +48,8 @@ class LocalCourseService {
     NgForOf,
     NgIf,
     CommonModule,
-    LoaderComponent
+    LoaderComponent,
+    ErrorMessageComponent
   ],
   styleUrls: ['./courses.css']
 })
@@ -73,6 +75,7 @@ export class Courses implements OnInit {
     const id = this.auth.getCurrentUserId();
 
     this.loading = true;
+    this.error = null;
     this.courses$ = this.localService.getCoursesByStudent(id).pipe(
       catchError(err => {
         console.error('Error loading courses:', err);
@@ -88,5 +91,9 @@ export class Courses implements OnInit {
 
   openCourse(id: number | string) {
     this.router.navigate(['/student/courses', Number(id)]);
+  }
+
+  retryLoad(): void {
+    this.ngOnInit();
   }
 }

@@ -2,13 +2,16 @@
   <h1 class="page-title"> My Courses</h1>
   <hr class="header-separator">
 
+  @if (error) {
+    <app-error-message
+      [message]="'Failed to load courses. Please try again later.'"
+      (retry)="retryLoad()">
+    </app-error-message>
+  }
+
   @if (loading) {
     <app-loader [mode]="'inline'" [message]="'Loading courses...'"></app-loader>
   }
-
-  <div *ngIf="error" class="error-state text-red-600">
-    <p>{{ error }}</p>
-  </div>
 
   <div *ngIf="courses$ | async as courses">
     <div *ngIf="courses.length === 0 && !loading && !error" class="empty-state">

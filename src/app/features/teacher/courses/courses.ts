@@ -6,11 +6,12 @@ import { catchError, finalize } from 'rxjs/operators';
 import { AuthService, CourseService } from '../../../core';
 import { Course } from '../../../core/models';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 
 @Component({
   selector: 'app-courses',
   standalone: true,
-  imports: [CommonModule, LoaderComponent],
+  imports: [CommonModule, LoaderComponent, ErrorMessageComponent],
   templateUrl: './courses.html',
   styleUrl: './courses.css',
 })
@@ -61,5 +62,9 @@ export class Courses implements OnInit {
 
   openCourse(courseId: number | string): void {
     this.router.navigate(['/teacher/courses', Number(courseId)]);
+  }
+
+  retryLoad(): void {
+    this.ngOnInit();
   }
 }

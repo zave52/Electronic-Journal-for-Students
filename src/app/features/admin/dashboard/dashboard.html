@@ -1,6 +1,13 @@
 <div class="p-6 max-w-7xl mx-auto">
   <h1 class="text-3xl font-bold text-gray-800 mb-8">Administrator Dashboard</h1>
 
+  @if (error()) {
+    <app-error-message
+      [message]="error()!"
+      (retry)="retryLoad()">
+    </app-error-message>
+  }
+
   @if (isLoading()) {
     <app-loader [mode]="'inline'" [message]="'Loading dashboard data...'"></app-loader>
   } @else {

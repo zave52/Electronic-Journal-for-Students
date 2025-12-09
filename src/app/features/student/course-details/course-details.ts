@@ -7,19 +7,20 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 
 interface CourseDetailsData {
   course: any;
   teacher: any;
   assignments: any[];
-  grades: Map<number, number>; // assignmentId -> grade
+  grades: Map<number, number>;
 }
 
 @Component({
   selector: 'app-course-details',
   standalone: true,
   templateUrl: 'course-details.html',
-  imports: [CommonModule, LoaderComponent],
+  imports: [CommonModule, LoaderComponent, ErrorMessageComponent],
   styleUrls: ['course-details.css']
 })
 export class StudentCourseDetailsPageComponent implements OnInit {
@@ -44,6 +45,7 @@ export class StudentCourseDetailsPageComponent implements OnInit {
       return;
     }
 
+    this.error = null;
     const courseId = Number(this.route.snapshot.paramMap.get('id'));
     const currentUser = this.authService.getCurrentUser();
     const studentId = currentUser?.id;
@@ -104,5 +106,9 @@ export class StudentCourseDetailsPageComponent implements OnInit {
 
   getGradeForAssignment(assignmentId: number, gradesMap: Map<number, number>): number | null {
     return gradesMap.get(Number(assignmentId)) || null;
+  }
+
+  retryLoad(): void {
+    this.ngOnInit();
   }
 }

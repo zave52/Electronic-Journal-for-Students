@@ -1,13 +1,16 @@
 <div class="assignments-list-container">
   <h2 class="text-xl font-semibold">Assignments</h2>
 
+  @if (error) {
+    <app-error-message
+      [message]="'Failed to load assignments. Please try again later.'"
+      (retry)="retryLoad()">
+    </app-error-message>
+  }
+
   @if (isLoading) {
     <app-loader [mode]="'inline'" [message]="'Loading assignments...'"></app-loader>
   }
-
-  <div *ngIf="error" class="state-message error text-red-600">
-    <p>Error: {{ error }}</p>
-  </div>
 
   <div *ngIf="assignments$ | async as assignments">
     <div *ngIf="assignments.length === 0 && !isLoading && !error" class="empty-state text-gray-600">

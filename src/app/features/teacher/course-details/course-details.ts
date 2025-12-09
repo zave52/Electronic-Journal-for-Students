@@ -9,13 +9,14 @@ import { GradebookComponent } from '../gradebook/gradebook.component';
 import { CourseInfoComponent } from '../course-info/course-info.component';
 import { LessonsAssignmentsComponent } from '../lessons-assignments/lessons-assignments.component';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 
 type TabName = 'information' | 'lessons' | 'gradebook';
 
 @Component({
   selector: 'app-course-details',
   standalone: true,
-  imports: [CommonModule, GradebookComponent, CourseInfoComponent, LessonsAssignmentsComponent, LoaderComponent],
+  imports: [CommonModule, GradebookComponent, CourseInfoComponent, LessonsAssignmentsComponent, LoaderComponent, ErrorMessageComponent],
   templateUrl: './course-details.html',
   styleUrl: './course-details.css',
 })
@@ -69,5 +70,9 @@ export class CourseDetails implements OnInit {
 
   isActiveTab(tab: TabName): boolean {
     return this.activeTab === tab;
+  }
+
+  retryLoad(): void {
+    this.ngOnInit();
   }
 }

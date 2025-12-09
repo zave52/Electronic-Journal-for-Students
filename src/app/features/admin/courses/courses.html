@@ -13,6 +13,13 @@
     </button>
   </div>
 
+  @if (error()) {
+    <app-error-message
+      [message]="error()!"
+      (retry)="retryLoad()">
+    </app-error-message>
+  }
+
   @if (isLoading()) {
     <app-loader [mode]="'inline'" [message]="'Loading courses...'"></app-loader>
   } @else {

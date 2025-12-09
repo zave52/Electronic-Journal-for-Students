@@ -5,11 +5,13 @@ import { Course, Enrollment, User } from '../../../core/models';
 import { CourseService, EnrollmentService, UserService } from '../../../core/services';
 import { CourseFormComponent } from '../../../shared/components/course-form/course-form';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
-import { forkJoin } from 'rxjs';
+import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
+import { forkJoin, of } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-courses',
-  imports: [CommonModule, CourseFormComponent, LoaderComponent],
+  imports: [CommonModule, CourseFormComponent, LoaderComponent, ErrorMessageComponent],
   templateUrl: './courses.html',
   styleUrl: './courses.css',
 })
@@ -25,6 +27,7 @@ export class Courses implements OnInit {
   showModal = signal(false);
   selectedCourse = signal<Course | null>(null);
   isLoading = signal(false);
+  error = signal<string | null>(null);
 
   getTeacherName = computed(() => {
     const users = this.users();
@@ -40,36 +43,47 @@ export class Courses implements OnInit {
 
   loadData(): void {
     this.isLoading.set(true);
+    this.error.set(null);
 
-    this.userService.getUsers().subscribe({
-      next: (users) => {
-        this.users.set(users);
-        this.loadCoursesAndEnrollments();
-      },
-      error: (error) => {
-        console.error('Error loading users:', error);
-        this.isLoading.set(false);
-      }
-    });
+    this.userService.getUsers()
+      .pipe(
+        catchError((err) => {
+          console.error('Error loading users:', err);
+          this.error.set('Failed to load courses. Please try again later.');
+          return of([]);
+        })
+      )
+      .subscribe({
+        next: (users) => {
+          this.users.set(users);
+          this.loadCoursesAndEnrollments();
+        }
+      });
   }
 
   private loadCoursesAndEnrollments(): void {
     forkJoin({
       courses: this.courseService.getCourses(),
       enrollments: this.enrollmentService.getAllEnrollments()
-    }).subscribe({
-      next: ({ courses, enrollments }) => {
-        console.log('Loaded courses:', courses);
-        console.log('Loaded enrollments:', enrollments);
-        this.courses.set(courses);
-        this.enrollments.set(enrollments);
-        this.isLoading.set(false);
-      },
-      error: (error) => {
-        console.error('Error loading data:', error);
-        this.isLoading.set(false);
-      }
-    });
+    })
+      .pipe(
+        catchError((err) => {
+          console.error('Error loading data:', err);
+          this.error.set('Failed to load courses. Please try again later.');
+          return of({ courses: [], enrollments: [] });
+        }),
+        finalize(() => this.isLoading.set(false))
+      )
+      .subscribe({
+        next: ({ courses, enrollments }) => {
+          this.courses.set(courses);
+          this.enrollments.set(enrollments);
+        }
+      });
+  }
+
+  retryLoad(): void {
+    this.loadData();
   }
 
   getStudentCount(courseId: number): number {

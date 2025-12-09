@@ -3,10 +3,14 @@ import { CommonModule } from '@angular/common';
 import { User } from '../../../core/models';
 import { UserService } from '../../../core/services';
 import { UserFormComponent } from '../../../shared/components/user-form/user-form';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
+import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-users',
-  imports: [CommonModule, UserFormComponent],
+  imports: [CommonModule, UserFormComponent, LoaderComponent, ErrorMessageComponent],
   templateUrl: './users.html',
   styleUrl: './users.css',
 })
@@ -15,16 +19,33 @@ export class Users implements OnInit {
   users = signal<User[]>([]);
   showModal = signal(false);
   selectedUser = signal<User | null>(null);
+  isLoading = signal(false);
+  error = signal<string | null>(null);
 
   ngOnInit(): void {
     this.loadUsers();
   }
 
   loadUsers(): void {
-    this.userService.getUsers().subscribe({
-      next: (users) => this.users.set(users),
-      error: (error) => console.error('Error loading users:', error)
-    });
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    this.userService.getUsers()
+      .pipe(
+        catchError((err) => {
+          console.error('Error loading users:', err);
+          this.error.set('Failed to load users. Please try again later.');
+          return of([]);
+        }),
+        finalize(() => this.isLoading.set(false))
+      )
+      .subscribe({
+        next: (users) => this.users.set(users)
+      });
+  }
+
+  retryLoad(): void {
+    this.loadUsers();
   }
 
   onEdit(user: User): void {
