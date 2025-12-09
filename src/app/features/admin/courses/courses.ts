@@ -7,10 +7,12 @@ import { LoaderComponent } from '../../../shared/components/loader/loader.compon
 import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
+import { ButtonComponent } from '../../../shared/ui/button/button.component';
+import { CardComponent } from '../../../shared/ui/card/card.component';
 
 @Component({
   selector: 'app-courses',
-  imports: [CourseFormComponent, LoaderComponent, ErrorMessageComponent],
+  imports: [CourseFormComponent, LoaderComponent, ErrorMessageComponent, ButtonComponent, CardComponent],
   templateUrl: './courses.html',
   styleUrl: './courses.css',
 })

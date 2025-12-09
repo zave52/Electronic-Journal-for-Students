@@ -2,55 +2,61 @@
   <h1 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">My Grades</h1>
   <hr class="mb-4 sm:mb-6 border-gray-300">
 
-  @if (error) {
+  @if (error()) {
     <app-error-message
-      [message]="error"
+      [message]="error()!"
       (retry)="retryLoad()">
     </app-error-message>
   }
 
-  @if (loading) {
+  @if (loading()) {
     <app-loader [mode]="'inline'" [message]="'Loading grades...'"></app-loader>
   }
 
-  <div *ngIf="grades$ | async as grades">
+  @if (!loading() && !error()) {
+    @if (grades().length === 0) {
+      <app-card class="empty-state text-center py-8 sm:py-12">
+        <h2 class="text-xl sm:text-2xl font-semibold text-gray-700 mb-3">⚠️ No Grades Recorded Yet</h2>
+        <p class="text-sm sm:text-base text-gray-600">Please check with your instructor if you are expecting
+          results.</p>
+      </app-card>
+    }
 
-    <div *ngIf="grades.length === 0 && !loading && !error" class="empty-state text-center py-8 sm:py-12">
-      <h2 class="text-xl sm:text-2xl font-semibold text-gray-700 mb-3">⚠️ No Grades Recorded Yet</h2>
-      <p class="text-sm sm:text-base text-gray-600">Please check with your instructor if you are expecting results.</p>
-    </div>
+    @if (grades().length > 0) {
+      <div class="space-y-3 sm:space-y-4">
+        @for (gradeItem of grades(); track gradeItem.id) {
+          <app-card class="p-3 sm:p-5">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-2 break-words">
+                  {{ gradeItem.assignmentName }}
+                </h3>
 
-    <div *ngIf="grades.length > 0" class="space-y-3 sm:space-y-4">
+                <a
+                  [routerLink]="['/student/courses', gradeItem.courseId]"
+                  class="text-xs sm:text-sm text-blue-600 hover:text-blue-800 hover:underline cursor-pointer inline-block">
+                  {{ gradeItem.courseName }}
+                </a>
+              </div>
 
-      <div *ngFor="let gradeItem of grades"
-           class="grade-card border rounded-lg p-3 sm:p-5 hover:shadow-md transition-shadow bg-white">
-
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
-          <div class="flex-1 min-w-0">
-            <h3
-              class="text-base sm:text-lg font-semibold text-gray-900 mb-2 break-words">{{ gradeItem.assignmentName }}</h3>
-
-            <a
-              [routerLink]="['/student/courses', gradeItem.courseId]"
-              class="text-xs sm:text-sm text-blue-600 hover:text-blue-800 hover:underline cursor-pointer inline-block">
-              {{ gradeItem.courseName }}
-            </a>
-          </div>
-
-          <div class="flex-shrink-0 self-start sm:ml-4">
-            <span
-              class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-base sm:text-lg font-bold"
-              [ngClass]="{
-                    'bg-green-100 text-green-800': gradeItem.grade >= 90,
-                    'bg-blue-100 text-blue-800': gradeItem.grade >= 75 && gradeItem.grade < 90,
-                    'bg-yellow-100 text-yellow-800': gradeItem.grade >= 60 && gradeItem.grade < 75,
-                    'bg-red-100 text-red-800': gradeItem.grade < 60
-                  }">
-              {{ gradeItem.grade }}%
-            </span>
-          </div>
-        </div>
+              <div class="flex-shrink-0 self-start sm:ml-4">
+                <span
+                  class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-base sm:text-lg font-bold"
+                  [class.bg-green-100]="gradeItem.grade >= 90"
+                  [class.text-green-800]="gradeItem.grade >= 90"
+                  [class.bg-blue-100]="gradeItem.grade >= 75 && gradeItem.grade < 90"
+                  [class.text-blue-800]="gradeItem.grade >= 75 && gradeItem.grade < 90"
+                  [class.bg-yellow-100]="gradeItem.grade >= 60 && gradeItem.grade < 75"
+                  [class.text-yellow-800]="gradeItem.grade >= 60 && gradeItem.grade < 75"
+                  [class.bg-red-100]="gradeItem.grade < 60"
+                  [class.text-red-800]="gradeItem.grade < 60">
+                  {{ gradeItem.grade }}%
+                </span>
+              </div>
+            </div>
+          </app-card>
+        }
       </div>
-    </div>
-  </div>
+    }
+  }
 </div>

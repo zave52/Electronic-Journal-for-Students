@@ -1,10 +1,12 @@
 import { Component, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { User, UserRole } from '../../../core/models';
+import { ButtonComponent } from '../../ui/button/button.component';
+import { ModalComponent } from '../../ui/modal/modal.component';
 
 @Component({
   selector: 'app-user-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, ButtonComponent, ModalComponent],
   templateUrl: './user-form.html',
   styleUrl: './user-form.css',
 })

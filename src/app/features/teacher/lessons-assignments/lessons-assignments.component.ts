@@ -4,6 +4,8 @@ import { AssignmentService } from '../../../core';
 import { Assignment, Lesson } from '../../../core/models';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { finalize } from 'rxjs/operators';
+import { ButtonComponent } from '../../../shared/ui/button/button.component';
+import { ModalComponent } from '../../../shared/ui/modal/modal.component';
 
 interface LessonWithAssignments extends Lesson {
   assignments: Assignment[];
@@ -13,7 +15,7 @@ interface LessonWithAssignments extends Lesson {
 @Component({
   selector: 'app-lessons-assignments',
   standalone: true,
-  imports: [ReactiveFormsModule, LoaderComponent],
+  imports: [ReactiveFormsModule, LoaderComponent, ButtonComponent, ModalComponent],
   templateUrl: './lessons-assignments.component.html',
   styleUrl: './lessons-assignments.component.css',
 })

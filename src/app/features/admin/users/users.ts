@@ -7,10 +7,12 @@ import { LoaderComponent } from '../../../shared/components/loader/loader.compon
 import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { ButtonComponent } from '../../../shared/ui/button/button.component';
+import { CardComponent } from '../../../shared/ui/card/card.component';
 
 @Component({
   selector: 'app-users',
-  imports: [NgClass, UserFormComponent, LoaderComponent, ErrorMessageComponent],
+  imports: [NgClass, UserFormComponent, LoaderComponent, ErrorMessageComponent, ButtonComponent, CardComponent],
   templateUrl: './users.html',
   styleUrl: './users.css',
 })

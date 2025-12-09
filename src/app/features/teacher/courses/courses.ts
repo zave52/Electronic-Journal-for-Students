@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { AsyncPipe, isPlatformBrowser, NgIf, NgForOf } from '@angular/common';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
@@ -7,11 +7,12 @@ import { AuthService, CourseService } from '../../../core';
 import { Course } from '../../../core/models';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
+import { CardComponent } from '../../../shared/ui/card/card.component';
 
 @Component({
   selector: 'app-courses',
   standalone: true,
-  imports: [CommonModule, LoaderComponent, ErrorMessageComponent],
+  imports: [NgIf, NgForOf, AsyncPipe, LoaderComponent, ErrorMessageComponent, CardComponent],
   templateUrl: './courses.html',
   styleUrl: './courses.css',
 })
