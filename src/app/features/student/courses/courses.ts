@@ -5,7 +5,7 @@ import { catchError, map } from 'rxjs/operators';
 import { AuthService } from '../../../core';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
-import { CommonModule, isPlatformBrowser, NgForOf, NgIf } from '@angular/common';
+import { AsyncPipe, isPlatformBrowser, NgForOf, NgIf } from '@angular/common';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 
@@ -47,7 +47,7 @@ class LocalCourseService {
   imports: [
     NgForOf,
     NgIf,
-    CommonModule,
+    AsyncPipe,
     LoaderComponent,
     ErrorMessageComponent
   ],

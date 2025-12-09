@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { AsyncPipe, isPlatformBrowser, NgIf } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
@@ -16,7 +16,7 @@ type TabName = 'information' | 'lessons' | 'gradebook';
 @Component({
   selector: 'app-course-details',
   standalone: true,
-  imports: [CommonModule, GradebookComponent, CourseInfoComponent, LessonsAssignmentsComponent, LoaderComponent, ErrorMessageComponent],
+  imports: [NgIf, AsyncPipe, GradebookComponent, CourseInfoComponent, LessonsAssignmentsComponent, LoaderComponent, ErrorMessageComponent],
   templateUrl: './course-details.html',
   styleUrl: './course-details.css',
 })

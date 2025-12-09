@@ -1,5 +1,4 @@
 import { Component, Input, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AssignmentService } from '../../../core';
 import { Assignment, Lesson } from '../../../core/models';
@@ -14,7 +13,7 @@ interface LessonWithAssignments extends Lesson {
 @Component({
   selector: 'app-lessons-assignments',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
+  imports: [ReactiveFormsModule, LoaderComponent],
   templateUrl: './lessons-assignments.component.html',
   styleUrl: './lessons-assignments.component.css',
 })

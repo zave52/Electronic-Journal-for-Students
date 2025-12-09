@@ -1,5 +1,4 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Course, Enrollment, User } from '../../../core/models';
@@ -10,7 +9,7 @@ import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-course-details',
-  imports: [CommonModule, ReactiveFormsModule, LoaderComponent, ErrorMessageComponent],
+  imports: [ReactiveFormsModule, LoaderComponent, ErrorMessageComponent],
   templateUrl: './course-details.html',
   styleUrl: './course-details.css',
 })

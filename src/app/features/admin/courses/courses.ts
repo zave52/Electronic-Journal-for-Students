@@ -1,5 +1,4 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Course, Enrollment, User } from '../../../core/models';
 import { CourseService, EnrollmentService, UserService } from '../../../core/services';
@@ -11,7 +10,7 @@ import { catchError, finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-courses',
-  imports: [CommonModule, CourseFormComponent, LoaderComponent, ErrorMessageComponent],
+  imports: [CourseFormComponent, LoaderComponent, ErrorMessageComponent],
   templateUrl: './courses.html',
   styleUrl: './courses.css',
 })

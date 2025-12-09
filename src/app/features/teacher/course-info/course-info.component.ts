@@ -1,5 +1,4 @@
 import { Component, Input, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CourseService } from '../../../core';
 import { Course } from '../../../core/models';
@@ -8,7 +7,7 @@ import { finalize } from 'rxjs/operators';
 @Component({
   selector: 'app-course-info',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './course-info.component.html',
   styleUrl: './course-info.component.css',
 })
