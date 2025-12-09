@@ -16,6 +16,7 @@ import { catchError } from 'rxjs/operators';
 import { CourseService, GradeService } from '../../../core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 
 interface GradeCell {
   studentId: number;
@@ -28,7 +29,7 @@ interface GradeCell {
 @Component({
   selector: 'app-gradebook',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   templateUrl: './gradebook.component.html',
   styleUrls: ['./gradebook.component.css']
 })

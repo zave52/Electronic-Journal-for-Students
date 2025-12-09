@@ -6,6 +6,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { RouterLink } from '@angular/router';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 
 interface EnrichedGrade {
   id: number;
@@ -19,7 +20,7 @@ interface EnrichedGrade {
 @Component({
   selector: 'app-my-grades',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, LoaderComponent],
   templateUrl: './grades.html',
   styleUrls: ['./grades.css']
 })

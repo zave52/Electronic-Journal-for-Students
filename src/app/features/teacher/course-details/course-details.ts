@@ -8,13 +8,14 @@ import { Course } from '../../../core/models';
 import { GradebookComponent } from '../gradebook/gradebook.component';
 import { CourseInfoComponent } from '../course-info/course-info.component';
 import { LessonsAssignmentsComponent } from '../lessons-assignments/lessons-assignments.component';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 
 type TabName = 'information' | 'lessons' | 'gradebook';
 
 @Component({
   selector: 'app-course-details',
   standalone: true,
-  imports: [CommonModule, GradebookComponent, CourseInfoComponent, LessonsAssignmentsComponent],
+  imports: [CommonModule, GradebookComponent, CourseInfoComponent, LessonsAssignmentsComponent, LoaderComponent],
   templateUrl: './course-details.html',
   styleUrl: './course-details.css',
 })

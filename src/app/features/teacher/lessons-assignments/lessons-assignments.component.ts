@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AssignmentService } from '../../../core';
 import { Assignment, Lesson } from '../../../core/models';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { finalize } from 'rxjs/operators';
 
 interface LessonWithAssignments extends Lesson {
@@ -13,7 +14,7 @@ interface LessonWithAssignments extends Lesson {
 @Component({
   selector: 'app-lessons-assignments',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
   templateUrl: './lessons-assignments.component.html',
   styleUrl: './lessons-assignments.component.css',
 })

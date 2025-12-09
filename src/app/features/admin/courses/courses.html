@@ -14,9 +14,7 @@
   </div>
 
   @if (isLoading()) {
-    <div class="text-center py-8">
-      <p class="text-gray-500">Loading courses...</p>
-    </div>
+    <app-loader [mode]="'inline'" [message]="'Loading courses...'"></app-loader>
   } @else {
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200">

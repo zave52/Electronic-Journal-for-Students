@@ -6,6 +6,7 @@ import { AuthService } from '../../../core';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { CommonModule, isPlatformBrowser, NgForOf, NgIf } from '@angular/common';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 
 @Injectable()
 class LocalCourseService {
@@ -45,7 +46,8 @@ class LocalCourseService {
   imports: [
     NgForOf,
     NgIf,
-    CommonModule
+    CommonModule,
+    LoaderComponent
   ],
   styleUrls: ['./courses.css']
 })
@@ -88,4 +90,3 @@ export class Courses implements OnInit {
     this.router.navigate(['/student/courses', Number(id)]);
   }
 }
-

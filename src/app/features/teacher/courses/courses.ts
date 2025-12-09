@@ -5,11 +5,12 @@ import { Observable, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 import { AuthService, CourseService } from '../../../core';
 import { Course } from '../../../core/models';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-courses',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LoaderComponent],
   templateUrl: './courses.html',
   styleUrl: './courses.css',
 })

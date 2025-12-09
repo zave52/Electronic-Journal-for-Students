@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { Course, Enrollment, User } from '../../../core/models';
 import { CourseService, EnrollmentService, UserService } from '../../../core/services';
 import { CourseFormComponent } from '../../../shared/components/course-form/course-form';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-courses',
-  imports: [CommonModule, CourseFormComponent],
+  imports: [CommonModule, CourseFormComponent, LoaderComponent],
   templateUrl: './courses.html',
   styleUrl: './courses.css',
 })
