@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Header } from '../header/header';
 import { Sidebar } from '../sidebar/sidebar';
+import { MobileMenuService } from '../../services/mobile-menu.service';
 
 @Component({
   selector: 'app-layout',
@@ -11,5 +12,5 @@ import { Sidebar } from '../sidebar/sidebar';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Layout {
-
+  mobileMenuService = inject(MobileMenuService);
 }

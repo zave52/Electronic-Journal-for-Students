@@ -1,8 +1,9 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../core';
+import { MobileMenuService } from '../../services/mobile-menu.service';
 
 @Component({
   selector: 'app-header',
@@ -14,6 +15,7 @@ import { AuthService } from '../../../core';
 export class Header {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private mobileMenuService = inject(MobileMenuService);
 
   currentUser = toSignal(this.authService.currentUser$, { initialValue: null });
   userName = computed(() => {
@@ -21,10 +23,8 @@ export class Header {
     return user ? user.name : 'Guest';
   });
 
-  isMobileMenuOpen = signal(false);
-
   toggleMobileMenu(): void {
-    this.isMobileMenuOpen.update(value => !value);
+    this.mobileMenuService.toggleMenu();
   }
 
   logout(): void {

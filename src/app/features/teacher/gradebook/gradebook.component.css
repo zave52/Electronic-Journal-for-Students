@@ -1,8 +1,21 @@
 .gradebook-container {
   max-width: 100%;
-  overflow: visible !important;
   height: auto;
   min-height: 0;
+  overflow: visible;
+}
+
+@media (max-width: 767px) {
+  .gradebook-container {
+    padding: 0.5rem;
+    overflow: visible;
+  }
+}
+
+@media (min-width: 768px) {
+  .gradebook-container {
+    padding: 1.5rem;
+  }
 }
 
 .gradebook-content {
@@ -12,10 +25,37 @@
   min-height: 0;
 }
 
+@media (max-width: 767px) {
+  .gradebook-content {
+    max-width: calc(100vw - 1rem);
+  }
+
+  .gradebook-content > div {
+    max-width: 100%;
+  }
+}
+
 table {
   border-spacing: 0;
   border-collapse: separate;
   margin-bottom: 2rem;
+  font-size: 0.875rem;
+}
+
+table th {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+table td {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+table input[type="number"] {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  min-width: 60px;
 }
 
 th.sticky {
@@ -42,11 +82,19 @@ input:disabled {
 }
 
 .table-wrapper {
-  -webkit-overflow-scrolling: touch;
   overflow-x: auto;
-  overflow-y: visible !important;
+  overflow-y: visible;
   max-height: none;
   height: auto;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 767px) {
+  .table-wrapper {
+    overflow-x: auto;
+    max-width: calc(100vw - 2rem);
+  }
 }
 
 .table-wrapper::-webkit-scrollbar {

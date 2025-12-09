@@ -11,8 +11,30 @@
   transition: transform 0.2s ease-in-out;
 }
 
+@media (max-width: 640px) {
+  .card-container {
+    margin: 0.75rem;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .card-container {
+    margin: 0.5rem;
+    padding: 1.25rem;
+  }
+}
+
 .card-container:hover {
   transform: scale(1.01);
+}
+
+@media (max-width: 640px) {
+  .card-container:hover {
+    transform: none;
+  }
 }
 
 .logo-circle {
@@ -27,12 +49,25 @@
   box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
 }
 
+@media (max-width: 640px) {
+  .logo-circle {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+}
+
 .title {
   font-size: 1.875rem; /* text-3xl */
   font-weight: 700;
   margin-top: 1rem;
   color: #1f2937; /* gray-800 */
   letter-spacing: -0.01em;
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 1.5rem; /* text-2xl */
+  }
 }
 
 .subtitle {
@@ -56,6 +91,16 @@
   border-radius: 0.5rem;
   color: #1f2937;
   transition: box-shadow 0.2s, border-color 0.2s;
+  font-size: 1rem;
+  min-height: 44px;
+}
+
+@media (max-width: 640px) {
+  .input-field {
+    padding: 0.75rem 1rem;
+    font-size: 16px;
+    min-height: 48px;
+  }
 }
 
 .input-field:focus {
@@ -72,10 +117,30 @@
   border-radius: 0.5rem;
   font-weight: 600;
   transition: background-color 0.2s, opacity 0.2s;
+  min-height: 44px;
+  font-size: 1rem;
+}
+
+@media (max-width: 640px) {
+  .submit-btn {
+    padding: 0.875rem 0;
+    min-height: 48px;
+    font-size: 1rem;
+  }
 }
 
 .submit-btn:hover:not(:disabled) {
   background-color: #1d4ed8; /* blue-700 */
+}
+
+@media (max-width: 640px) {
+  .submit-btn:hover:not(:disabled) {
+    background-color: #2563eb;
+  }
+
+  .submit-btn:active:not(:disabled) {
+    background-color: #1d4ed8;
+  }
 }
 
 .submit-btn:disabled {

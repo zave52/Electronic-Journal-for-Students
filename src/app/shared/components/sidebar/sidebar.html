@@ -24,6 +24,7 @@
             routerLinkActive="bg-blue-600 text-white shadow-md"
             [routerLinkActiveOptions]="{exact: false}"
             class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-all duration-200 group"
+            (click)="onLinkClick()"
           >
             @switch (link.icon) {
               @case ('dashboard') {
@@ -74,4 +75,3 @@
     <p class="text-xs text-gray-400 text-center">© 2025 E-Journal</p>
   </div>
 </aside>
-

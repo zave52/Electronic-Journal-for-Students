@@ -1,5 +1,5 @@
-<div class="assignments-list-container">
-  <h2 class="text-xl font-semibold">Assignments</h2>
+<div class="assignments-list-container p-4 sm:p-6">
+  <h2 class="text-xl sm:text-2xl font-semibold mb-4">Assignments</h2>
 
   @if (error) {
     <app-error-message
@@ -13,39 +13,42 @@
   }
 
   <div *ngIf="assignments$ | async as assignments">
-    <div *ngIf="assignments.length === 0 && !isLoading && !error" class="empty-state text-gray-600">
+    <div *ngIf="assignments.length === 0 && !isLoading && !error" class="empty-state text-gray-600 text-center py-8">
       <p>You don't have any assignments.</p>
     </div>
 
-    <ul *ngIf="assignments.length > 0" class="assignment-list" role="list">
-      <li *ngFor="let assignment of assignments" class="assignment-item mb-4 p-4 border rounded">
-        <div class="flex items-start gap-3">
-          <input
-            type="checkbox"
-            [checked]="assignment.completed"
-            (change)="toggleCompletion(assignment)"
-            [disabled]="hasGrade(assignment)"
-            [class.cursor-pointer]="!hasGrade(assignment)"
-            [class.cursor-not-allowed]="hasGrade(assignment)"
-            [class.opacity-50]="hasGrade(assignment)"
-            class="mt-1 w-5 h-5"
-            [attr.aria-label]="'Mark ' + assignment.title + ' as ' + (assignment.completed ? 'incomplete' : 'complete')"
-            [title]="hasGrade(assignment) ? 'Cannot uncheck - assignment is graded' : ''"
-          />
-          <div class="flex-1">
-            <h3 class="font-medium text-lg" [class.line-through]="assignment.completed"
+    <ul *ngIf="assignments.length > 0" class="assignment-list space-y-3 sm:space-y-4" role="list">
+      <li *ngFor="let assignment of assignments"
+          class="assignment-item bg-white p-3 sm:p-4 border rounded-lg shadow-sm">
+        <div class="flex items-start gap-3 sm:gap-4">
+          <div class="flex-shrink-0 pt-1">
+            <input
+              type="checkbox"
+              [checked]="assignment.completed"
+              (change)="toggleCompletion(assignment)"
+              [disabled]="hasGrade(assignment)"
+              [class.cursor-pointer]="!hasGrade(assignment)"
+              [class.cursor-not-allowed]="hasGrade(assignment)"
+              [class.opacity-50]="hasGrade(assignment)"
+              class="w-6 h-6 sm:w-5 sm:h-5 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              [attr.aria-label]="'Mark ' + assignment.title + ' as ' + (assignment.completed ? 'incomplete' : 'complete')"
+              [title]="hasGrade(assignment) ? 'Cannot uncheck - assignment is graded' : ''"
+            />
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-semibold text-base sm:text-lg break-words" [class.line-through]="assignment.completed"
                 [class.text-gray-400]="assignment.completed">
               {{ assignment.title }}
             </h3>
             <a
               [routerLink]="['/student/courses', assignment.courseId]"
-              class="text-sm text-blue-600 hover:text-blue-800 hover:underline cursor-pointer mb-1 inline-block">
+              class="text-xs sm:text-sm text-blue-600 hover:text-blue-800 hover:underline cursor-pointer mt-1 inline-block">
               {{ assignment.courseName }}
             </a>
-            <p class="deadline text-sm text-gray-500">
-              Deadline: {{ assignment.deadline ? (assignment.deadline | date:'medium') : 'No deadline' }}
+            <p class="deadline text-xs sm:text-sm text-gray-500 mt-1">
+              Deadline: {{ assignment.deadline ? (assignment.deadline | date:'short') : 'No deadline' }}
             </p>
-            <p class="instructions mt-2">{{ assignment.instructions }}</p>
+            <p class="instructions text-sm text-gray-700 mt-2 break-words">{{ assignment.instructions }}</p>
           </div>
         </div>
       </li>
