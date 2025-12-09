@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { RouterLink } from '@angular/router';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 
 interface EnrichedGrade {
   id: number;
@@ -20,7 +21,7 @@ interface EnrichedGrade {
 @Component({
   selector: 'app-my-grades',
   standalone: true,
-  imports: [CommonModule, RouterLink, LoaderComponent],
+  imports: [CommonModule, RouterLink, LoaderComponent, ErrorMessageComponent],
   templateUrl: './grades.html',
   styleUrls: ['./grades.css']
 })
@@ -120,6 +121,10 @@ export class Grades implements OnInit {
     return forkJoin(requests).pipe(
       map(assignments => assignments.filter(a => a !== null))
     );
+  }
+
+  retryLoad(): void {
+    this.fetchStudentGrades();
   }
 }
 

@@ -6,10 +6,13 @@ import { UserService } from '../../../core/services/user';
 import { EnrollmentService } from '../../../core/services/enrollment';
 import { Course, Enrollment, User } from '../../../core/models';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
+import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, LoaderComponent],
+  imports: [CommonModule, LoaderComponent, ErrorMessageComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -24,6 +27,7 @@ export class Dashboard implements OnInit {
   users = signal<User[]>([]);
   enrollments = signal<Enrollment[]>([]);
   isLoading = signal<boolean>(true);
+  error = signal<string | null>(null);
 
   totalCourses = computed(() => this.courses().length);
   totalStudents = computed(() =>
@@ -43,45 +47,60 @@ export class Dashboard implements OnInit {
 
   private loadDashboardData(): void {
     this.isLoading.set(true);
+    this.error.set(null);
 
-    this.courseService.getCourses().subscribe({
-      next: (courses) => {
-        this.courses.set(courses);
-        this.checkLoadingComplete();
-      },
-      error: (error) => {
-        console.error('Error loading courses:', error);
-        this.checkLoadingComplete();
-      }
-    });
-
-    this.userService.getUsers().subscribe({
-      next: (users) => {
-        this.users.set(users);
-        this.checkLoadingComplete();
-      },
-      error: (error) => {
-        console.error('Error loading users:', error);
-        this.checkLoadingComplete();
-      }
-    });
-
-    this.enrollmentService.getAllEnrollments().subscribe({
-      next: (enrollments) => {
-        this.enrollments.set(enrollments);
-        this.checkLoadingComplete();
-      },
-      error: (error) => {
-        console.error('Error loading enrollments:', error);
-        this.checkLoadingComplete();
-      }
-    });
+    this.courseService.getCourses()
+      .pipe(
+        catchError((err) => {
+          console.error('Error loading courses:', err);
+          this.error.set('Failed to load dashboard data. Please try again later.');
+          return of([]);
+        }),
+        finalize(() => this.isLoading.set(false))
+      )
+      .subscribe({
+        next: (courses) => {
+          this.courses.set(courses);
+          this.loadUsers();
+        }
+      });
   }
 
-  private checkLoadingComplete(): void {
-    if (this.courses().length >= 0 && this.users().length >= 0 && this.enrollments().length >= 0) {
-      this.isLoading.set(false);
-    }
+  private loadUsers(): void {
+    this.userService.getUsers()
+      .pipe(
+        catchError((err) => {
+          console.error('Error loading users:', err);
+          this.error.set('Failed to load dashboard data. Please try again later.');
+          return of([]);
+        })
+      )
+      .subscribe({
+        next: (users) => {
+          this.users.set(users);
+          this.loadEnrollments();
+        }
+      });
+  }
+
+  private loadEnrollments(): void {
+    this.enrollmentService.getAllEnrollments()
+      .pipe(
+        catchError((err) => {
+          console.error('Error loading enrollments:', err);
+          this.error.set('Failed to load dashboard data. Please try again later.');
+          return of([]);
+        })
+      )
+      .subscribe({
+        next: (enrollments) => {
+          this.enrollments.set(enrollments);
+        }
+      });
+  }
+
+  retryLoad(): void {
+    this.loadDashboardData();
   }
 
   navigateToCourses(): void {

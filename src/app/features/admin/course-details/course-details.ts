@@ -5,11 +5,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Course, Enrollment, User } from '../../../core/models';
 import { CourseService, EnrollmentService, UserService } from '../../../core/services';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-course-details',
-  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
+  imports: [CommonModule, ReactiveFormsModule, LoaderComponent, ErrorMessageComponent],
   templateUrl: './course-details.html',
   styleUrl: './course-details.css',
 })

@@ -17,6 +17,7 @@ import { CourseService, GradeService } from '../../../core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 
 interface GradeCell {
   studentId: number;
@@ -29,7 +30,7 @@ interface GradeCell {
 @Component({
   selector: 'app-gradebook',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoaderComponent],
+  imports: [CommonModule, FormsModule, LoaderComponent, ErrorMessageComponent],
   templateUrl: './gradebook.component.html',
   styleUrls: ['./gradebook.component.css']
 })
@@ -399,5 +400,9 @@ export class GradebookComponent implements OnInit, OnChanges, AfterViewInit {
 
     if (grades.length === 0) return null;
     return Math.round(grades.reduce((sum, g) => sum + g, 0) / grades.length);
+  }
+
+  retryLoad(): void {
+    this.loadGradebook();
   }
 }

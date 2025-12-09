@@ -1,11 +1,14 @@
 <div class="course-details-container p-6 max-w-6xl mx-auto">
+  @if (error) {
+    <app-error-message
+      [message]="'Failed to load course details. Please try again later.'"
+      (retry)="retryLoad()">
+    </app-error-message>
+  }
+
   @if (loading) {
     <app-loader [mode]="'inline'" [message]="'Loading course details...'"></app-loader>
   }
-
-  <div *ngIf="error" class="error-state text-red-600 text-center py-8">
-    <p>{{ error }}</p>
-  </div>
 
   <div *ngIf="courseData$ | async as data">
     <div class="course-header mb-8">
