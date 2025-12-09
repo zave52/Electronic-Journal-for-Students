@@ -6,6 +6,7 @@ import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 
 interface CourseDetailsData {
   course: any;
@@ -18,7 +19,7 @@ interface CourseDetailsData {
   selector: 'app-course-details',
   standalone: true,
   templateUrl: 'course-details.html',
-  imports: [CommonModule],
+  imports: [CommonModule, LoaderComponent],
   styleUrls: ['course-details.css']
 })
 export class StudentCourseDetailsPageComponent implements OnInit {

@@ -7,11 +7,12 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Assignment } from '../../../core/models/assignment.model';
 import { AuthService, StudentTask, StudentTaskService } from '../../../core';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-assignments',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, LoaderComponent],
   templateUrl: './assignments.html',
   styleUrls: ['./assignments.css']
 })

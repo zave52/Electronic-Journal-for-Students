@@ -2,9 +2,9 @@
   <h1 class="page-title"> My Courses</h1>
   <hr class="header-separator">
 
-  <div *ngIf="loading" class="loading-state">
-    <p>Loading courses...</p>
-  </div>
+  @if (loading) {
+    <app-loader [mode]="'inline'" [message]="'Loading courses...'"></app-loader>
+  }
 
   <div *ngIf="error" class="error-state text-red-600">
     <p>{{ error }}</p>

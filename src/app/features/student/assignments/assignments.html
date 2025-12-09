@@ -1,9 +1,9 @@
 <div class="assignments-list-container">
   <h2 class="text-xl font-semibold">Assignments</h2>
 
-  <div *ngIf="isLoading" class="state-message loading">
-    <p>Loading assignments...</p>
-  </div>
+  @if (isLoading) {
+    <app-loader [mode]="'inline'" [message]="'Loading assignments...'"></app-loader>
+  }
 
   <div *ngIf="error" class="state-message error text-red-600">
     <p>Error: {{ error }}</p>

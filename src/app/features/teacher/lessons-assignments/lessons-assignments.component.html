@@ -19,9 +19,7 @@
   </div>
 
   @if (loading()) {
-    <div class="text-center py-12">
-      <p class="text-gray-600">Loading lessons...</p>
-    </div>
+    <app-loader [mode]="'inline'" [message]="'Loading lessons...'"></app-loader>
   }
 
   @if (!loading() && lessons().length === 0) {

@@ -5,10 +5,11 @@ import { CourseService } from '../../../core/services/course';
 import { UserService } from '../../../core/services/user';
 import { EnrollmentService } from '../../../core/services/enrollment';
 import { Course, Enrollment, User } from '../../../core/models';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule],
+  imports: [CommonModule, LoaderComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush

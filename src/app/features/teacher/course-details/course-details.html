@@ -1,7 +1,7 @@
 <div class="teacher-course-details-container p-6 max-w-7xl mx-auto">
-  <div *ngIf="loading" class="loading-state text-center py-12">
-    <p class="text-gray-600 text-lg">Loading course details...</p>
-  </div>
+  @if (loading) {
+    <app-loader [mode]="'inline'" [size]="'md'" [message]="'Loading course details...'"></app-loader>
+  }
 
   <div *ngIf="error" class="error-state text-red-600 text-center py-12">
     <p class="text-lg">{{ error }}</p>

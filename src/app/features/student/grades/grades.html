@@ -2,9 +2,9 @@
   <h1 class="text-3xl font-bold mb-6">My Grades</h1>
   <hr class="mb-6 border-gray-300">
 
-  <div class="loading-state text-center py-8" *ngIf="loading">
-    <p class="text-gray-600">Loading grades...</p>
-  </div>
+  @if (loading) {
+    <app-loader [mode]="'inline'" [message]="'Loading grades...'"></app-loader>
+  }
 
   <div class="alert-error text-red-600 text-center py-8" *ngIf="error">
     Error: {{ error }}
@@ -45,7 +45,6 @@
             </span>
           </div>
         </div>
-
       </div>
     </div>
   </div>
