@@ -6,10 +6,12 @@ import { CourseService, EnrollmentService, UserService } from '../../../core/ser
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 import { forkJoin } from 'rxjs';
+import { ButtonComponent } from '../../../shared/ui/button/button.component';
+import { CardComponent } from '../../../shared/ui/card/card.component';
 
 @Component({
   selector: 'app-course-details',
-  imports: [ReactiveFormsModule, LoaderComponent, ErrorMessageComponent],
+  imports: [ReactiveFormsModule, LoaderComponent, ErrorMessageComponent, ButtonComponent, CardComponent],
   templateUrl: './course-details.html',
   styleUrl: './course-details.css',
 })

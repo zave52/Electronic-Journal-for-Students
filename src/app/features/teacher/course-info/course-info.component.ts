@@ -3,11 +3,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { CourseService } from '../../../core';
 import { Course } from '../../../core/models';
 import { finalize } from 'rxjs/operators';
+import { ButtonComponent } from '../../../shared/ui/button/button.component';
 
 @Component({
   selector: 'app-course-info',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, ButtonComponent],
   templateUrl: './course-info.component.html',
   styleUrl: './course-info.component.css',
 })

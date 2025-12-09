@@ -1,0 +1,13 @@
+:host {
+  display: inline-block;
+}
+
+:host(.full-width) {
+  display: block;
+  width: 100%;
+}
+
+:host(.flex-1) {
+  flex: 1;
+  display: block;
+}

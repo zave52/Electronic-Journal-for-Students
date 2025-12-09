@@ -108,7 +108,7 @@
 
     <div class="md:hidden space-y-4">
       @for (course of courses(); track course.id) {
-        <div class="bg-white rounded-lg shadow-md p-4">
+        <app-card class="p-4">
           <div class="mb-3">
             <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ course.name }}</h3>
             <div class="space-y-2 text-sm">
@@ -125,27 +125,33 @@
             </div>
           </div>
           <div class="flex gap-2 pt-3 border-t border-gray-200">
-            <button
+            <app-button
               (click)="onViewDetails(course)"
-              class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+              variant="primary"
+              size="sm"
+              class="flex-1">
               View
-            </button>
-            <button
+            </app-button>
+            <app-button
               (click)="onEdit(course)"
-              class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+              variant="primary"
+              size="sm"
+              class="flex-1">
               Edit
-            </button>
-            <button
+            </app-button>
+            <app-button
               (click)="onDelete(course)"
-              class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+              variant="danger"
+              size="sm"
+              class="flex-1">
               Delete
-            </button>
+            </app-button>
           </div>
-        </div>
+        </app-card>
       } @empty {
-        <div class="bg-white rounded-lg shadow-md p-8 text-center text-gray-500">
+        <app-card class="p-8 text-center text-gray-500">
           No courses found. Create your first course to get started.
-        </div>
+        </app-card>
       }
     </div>
   }

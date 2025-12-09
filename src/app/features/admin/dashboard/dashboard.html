@@ -12,8 +12,8 @@
     <app-loader [mode]="'inline'" [message]="'Loading dashboard data...'"></app-loader>
   } @else {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div
-        class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-blue-500"
+      <app-card
+        class="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-blue-500"
         (click)="navigateToCourses()">
         <div class="flex items-center justify-between">
           <div>
@@ -25,10 +25,10 @@
           </div>
           <div class="text-4xl">📚</div>
         </div>
-      </div>
+      </app-card>
 
-      <div
-        class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-green-500"
+      <app-card
+        class="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-green-500"
         (click)="navigateToUsers()">
         <div class="flex items-center justify-between">
           <div>
@@ -37,10 +37,10 @@
           </div>
           <div class="text-4xl">👨‍🎓</div>
         </div>
-      </div>
+      </app-card>
 
-      <div
-        class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-purple-500"
+      <app-card
+        class="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-purple-500"
         (click)="navigateToUsers()">
         <div class="flex items-center justify-between">
           <div>
@@ -49,9 +49,9 @@
           </div>
           <div class="text-4xl">👨‍🏫</div>
         </div>
-      </div>
+      </app-card>
 
-      <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-yellow-500">
+      <app-card class="hover:shadow-lg transition-shadow border-l-4 border-yellow-500">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600 uppercase">Total Enrollments</p>
@@ -59,23 +59,21 @@
           </div>
           <div class="text-4xl">✅</div>
         </div>
-      </div>
+      </app-card>
     </div>
 
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h2>
+    <app-card title="Quick Actions">
       <div class="flex flex-wrap gap-4">
-        <button
-          class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
+        <app-button
           (click)="navigateToCourses()">
           📚 Manage Courses
-        </button>
-        <button
-          class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium shadow-sm"
+        </app-button>
+        <app-button
+          variant="secondary"
           (click)="navigateToUsers()">
           👥 Manage Users
-        </button>
+        </app-button>
       </div>
-    </div>
+    </app-card>
   }
 </div>

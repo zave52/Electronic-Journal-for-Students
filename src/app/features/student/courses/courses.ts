@@ -8,6 +8,7 @@ import { environment } from '../../../../environments/environment';
 import { AsyncPipe, isPlatformBrowser, NgForOf, NgIf } from '@angular/common';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
+import { CardComponent } from '../../../shared/ui/card/card.component';
 
 @Injectable()
 class LocalCourseService {
@@ -49,7 +50,8 @@ class LocalCourseService {
     NgIf,
     AsyncPipe,
     LoaderComponent,
-    ErrorMessageComponent
+    ErrorMessageComponent,
+    CardComponent
   ],
   styleUrls: ['./courses.css']
 })

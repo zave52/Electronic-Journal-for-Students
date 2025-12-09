@@ -14,13 +14,15 @@
   }
 
   <div *ngIf="courses$ | async as courses">
-    <div *ngIf="courses.length === 0 && !loading && !error" class="empty-state">
-      <h2>You Are Not Currently Enrolled in Any Courses</h2>
-      <p>Please contact the administrator or use the "Course Catalog" menu to start learning.</p>
+    <div *ngIf="courses.length === 0 && !loading && !error">
+      <app-card class="empty-state">
+        <h2>You Are Not Currently Enrolled in Any Courses</h2>
+        <p>Please contact the administrator or use the "Course Catalog" menu to start learning.</p>
+      </app-card>
     </div>
 
     <div *ngIf="courses.length > 0" class="courses-grid">
-      <div
+      <app-card
         *ngFor="let course of courses"
         class="course-card"
         (click)="openCourse(course.id)">
@@ -38,7 +40,7 @@
         <div class="card-footer">
           <a class="course-link">Go to Course →</a>
         </div>
-      </div>
+      </app-card>
     </div>
   </div>
 </div>

@@ -17,9 +17,7 @@
   @if (isLoading()) {
     <app-loader [mode]="'inline'" [message]="'Loading course details...'"></app-loader>
   } @else if (course()) {
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ course()!.name }}</h2>
-
+    <app-card [title]="course()!.name" class="mb-6">
       @if (course()!.description) {
         <div class="mb-4">
           <h3 class="text-sm font-medium text-gray-500 uppercase mb-2">Description</h3>
@@ -40,11 +38,9 @@
           {{ getEnrolledCount() }} students enrolled
         </span>
       </div>
-    </div>
+    </app-card>
 
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h2 class="text-xl font-semibold text-gray-800 mb-4">Student Enrollment</h2>
-
+    <app-card title="Student Enrollment" class="mb-6">
       @if (students().length === 0) {
         <p class="text-sm text-gray-500 italic">No students available in the system.</p>
       } @else {
@@ -82,11 +78,9 @@
           Check or uncheck students to enroll/unenroll them from this course.
         </p>
       }
-    </div>
+    </app-card>
 
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-xl font-semibold text-gray-800 mb-4">Teacher Assignment</h2>
-
+    <app-card title="Teacher Assignment">
       <div class="mb-6 p-4 bg-gray-50 rounded-lg">
         <p class="text-sm text-gray-600 mb-1">Current Teacher</p>
         <p class="text-lg font-medium text-gray-800">{{ currentTeacherName() }}</p>
@@ -138,34 +132,24 @@
         </div>
 
         <div class="flex gap-3">
-          <button
+          <app-button
             type="submit"
-            [disabled]="teacherForm.invalid || isSaving() || !isTeacherChanged()"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2">
-            @if (isSaving()) {
-              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                   viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Saving...
-            } @else {
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd"/>
-              </svg>
-              Save Teacher Assignment
-            }
-          </button>
+            [disabled]="teacherForm.invalid || !isTeacherChanged()"
+            [loading]="isSaving()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd"/>
+            </svg>
+            Save Teacher Assignment
+          </app-button>
 
-          <button
+          <app-button
             type="button"
-            (click)="onBack()"
-            class="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors">
+            variant="secondary"
+            (click)="onBack()">
             Cancel
-          </button>
+          </app-button>
         </div>
 
         @if (!isTeacherChanged() && !isSaving()) {
@@ -174,15 +158,13 @@
           </p>
         }
       </form>
-    </div>
+    </app-card>
   } @else {
-    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+    <app-card>
       <p class="text-red-600 mb-4">Failed to load course details</p>
-      <button
-        (click)="onBack()"
-        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+      <app-button (click)="onBack()">
         Back to Courses
-      </button>
-    </div>
+      </app-button>
+    </app-card>
   }
 </div>

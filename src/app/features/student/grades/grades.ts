@@ -1,13 +1,13 @@
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID, signal, ChangeDetectionStrategy } from '@angular/core';
 import { AuthService, CourseService, GradeService } from '../../../core';
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { RouterLink } from '@angular/router';
-import { LoaderComponent } from '../../../shared/components/loader/loader.component';
-import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
+import { LoaderComponent, ErrorMessageComponent } from '../../../shared';
+import { CardComponent } from '../../../shared/ui/card/card.component';
 
 interface EnrichedGrade {
   id: number;
@@ -20,16 +20,16 @@ interface EnrichedGrade {
 
 @Component({
   selector: 'app-my-grades',
-  standalone: true,
-  imports: [CommonModule, RouterLink, LoaderComponent, ErrorMessageComponent],
   templateUrl: './grades.html',
-  styleUrls: ['./grades.css']
+  styleUrls: ['./grades.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLink, LoaderComponent, ErrorMessageComponent, CardComponent],
 })
 export class Grades implements OnInit {
 
-  grades$!: Observable<EnrichedGrade[]>;
-  loading = false;
-  error: string | null = null;
+  grades = signal<EnrichedGrade[]>([]);
+  loading = signal(false);
+  error = signal<string | null>(null);
 
   constructor(
     private gradeService: GradeService,
@@ -48,20 +48,20 @@ export class Grades implements OnInit {
   }
 
   fetchStudentGrades(): void {
-    this.loading = true;
-    this.error = null;
+    this.loading.set(true);
+    this.error.set(null);
 
     const currentUser = this.authService.getCurrentUser();
     const currentStudentId = currentUser?.id;
 
     if (!currentStudentId) {
-      this.error = 'Error: Unable to determine current user id.';
-      this.loading = false;
-      this.grades$ = of([]);
+      this.error.set('Error: Unable to determine current user id.');
+      this.loading.set(false);
+      this.grades.set([]);
       return;
     }
 
-    this.grades$ = this.gradeService.getGradesByStudentId(currentStudentId).pipe(
+    this.gradeService.getGradesByStudentId(currentStudentId).pipe(
       switchMap(grades => {
         if (!grades || grades.length === 0) {
           return of([]);
@@ -76,8 +76,8 @@ export class Grades implements OnInit {
           grades: of(grades)
         }).pipe(
           map(({ courses, assignments, grades }) => {
-            const courseMap = new Map(courses.map(c => [Number(c.id), c.name]));
-            const assignmentMap = new Map(assignments.map(a => [Number(a.id), a.title]));
+            const courseMap = new Map((courses as any[]).map((c: any) => [Number(c.id), c.name]));
+            const assignmentMap = new Map((assignments as any[]).map((a: any) => [Number(a.id), a.title]));
 
             return grades.map(g => ({
               id: Number(g.id),
@@ -92,11 +92,13 @@ export class Grades implements OnInit {
       }),
       catchError(err => {
         console.error('Failed to load grades:', err);
-        this.error = 'Failed to load grades. Please check JSON Server or your network connection.';
+        this.error.set('Failed to load grades. Please check JSON Server or your network connection.');
         return of([] as EnrichedGrade[]);
       }),
-      finalize(() => (this.loading = false))
-    );
+      finalize(() => this.loading.set(false))
+    ).subscribe(grades => {
+      this.grades.set(grades);
+    });
   }
 
   private fetchCourses(courseIds: number[]): Observable<any[]> {

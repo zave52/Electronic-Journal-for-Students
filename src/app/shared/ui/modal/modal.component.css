@@ -1,0 +1,53 @@
+:host {
+  display: block;
+}
+
+.modal-overlay {
+  @apply fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  @apply relative bg-white rounded-lg shadow-xl max-w-md w-full my-8;
+  animation: slideIn 0.2s ease-out;
+}
+
+.modal-header {
+  @apply flex items-center justify-between p-4 sm:p-5 border-b border-gray-200;
+}
+
+.modal-title {
+  @apply text-lg sm:text-xl font-semibold text-gray-900;
+}
+
+.modal-close-button {
+  @apply text-gray-400 hover:text-gray-600 transition-colors;
+}
+
+.modal-body {
+  @apply p-4 sm:p-6;
+}
+
+.modal-footer {
+  @apply flex flex-col sm:flex-row justify-end gap-3 p-4 sm:p-6 border-t border-gray-200;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

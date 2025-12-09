@@ -85,19 +85,17 @@
               </td>
             </tr>
           } @empty {
-            <tr>
-              <td colspan="4" class="px-6 py-8 text-center text-gray-500">
-                No users found.
-              </td>
-            </tr>
-          }
+        <app-card class="p-8 text-center text-gray-500">
+          No users found.
+        </app-card>
+      }
         </tbody>
       </table>
     </div>
 
     <div class="md:hidden space-y-4">
       @for (user of users(); track user.id) {
-        <div class="bg-white rounded-lg shadow-md p-4">
+        <app-card class="p-4">
           <div class="flex justify-between items-start mb-3">
             <div class="flex-1">
               <h3 class="text-lg font-semibold text-gray-900">{{ user.name }}</h3>
@@ -113,22 +111,18 @@
             </span>
           </div>
           <div class="flex gap-2 pt-3 border-t border-gray-200">
-            <button
-              (click)="onEdit(user)"
-              class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+            <app-button (click)="onEdit(user)" variant="primary" size="md" class="flex-1">
               Edit
-            </button>
-            <button
-              (click)="onDelete(user)"
-              class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+            </app-button>
+            <app-button (click)="onDelete(user)" variant="danger" size="md" class="flex-1">
               Delete
-            </button>
+            </app-button>
           </div>
-        </div>
+        </app-card>
       } @empty {
-        <div class="bg-white rounded-lg shadow-md p-8 text-center text-gray-500">
+        <app-card class="p-8 text-center text-gray-500">
           No users found.
-        </div>
+        </app-card>
       }
     </div>
   }
