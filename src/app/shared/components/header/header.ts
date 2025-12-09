@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../core';
 import { MobileMenuService } from '../../services/mobile-menu.service';
 
 @Component({
   selector: 'app-header',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './header.html',
   styleUrl: './header.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

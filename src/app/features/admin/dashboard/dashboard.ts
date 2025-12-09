@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { CourseService } from '../../../core/services/course';
 import { UserService } from '../../../core/services/user';
 import { EnrollmentService } from '../../../core/services/enrollment';
@@ -12,7 +11,7 @@ import { of } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, LoaderComponent, ErrorMessageComponent],
+  imports: [LoaderComponent, ErrorMessageComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush

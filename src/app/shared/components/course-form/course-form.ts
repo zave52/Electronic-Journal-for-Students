@@ -1,12 +1,11 @@
 import { Component, EventEmitter, inject, input, OnInit, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Course, User } from '../../../core/models';
 import { UserService } from '../../../core/services';
 
 @Component({
   selector: 'app-course-form',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './course-form.html',
   styleUrl: './course-form.css',
 })

@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { User } from '../../../core/models';
 import { UserService } from '../../../core/services';
 import { UserFormComponent } from '../../../shared/components/user-form/user-form';
@@ -10,7 +10,7 @@ import { of } from 'rxjs';
 
 @Component({
   selector: 'app-users',
-  imports: [CommonModule, UserFormComponent, LoaderComponent, ErrorMessageComponent],
+  imports: [NgClass, UserFormComponent, LoaderComponent, ErrorMessageComponent],
   templateUrl: './users.html',
   styleUrl: './users.css',
 })

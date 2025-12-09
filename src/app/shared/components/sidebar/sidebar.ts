@@ -1,6 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../core';
 import { MobileMenuService } from '../../services/mobile-menu.service';
@@ -14,7 +13,7 @@ interface NavLink {
 
 @Component({
   selector: 'app-sidebar',
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
