@@ -1,5 +1,17 @@
 .course-info-tab-container {
-  @apply bg-white rounded-lg shadow-sm p-6;
+  padding: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .course-info-tab-container {
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .course-info-tab-container {
+    padding: 1.5rem;
+  }
 }
 
 .form-group {

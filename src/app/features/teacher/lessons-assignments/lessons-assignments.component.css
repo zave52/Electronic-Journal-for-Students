@@ -1,5 +1,17 @@
 .lessons-assignments-container {
-  @apply bg-white rounded-lg shadow-sm p-6;
+  padding: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .lessons-assignments-container {
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .lessons-assignments-container {
+    padding: 1.5rem;
+  }
 }
 
 .modal-overlay {

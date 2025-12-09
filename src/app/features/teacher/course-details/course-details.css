@@ -3,6 +3,13 @@
   overflow: visible;
 }
 
+@media (max-width: 767px) {
+  .teacher-course-details-container {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+}
+
 .tabs-container button {
   cursor: pointer;
   transition: all 0.2s ease;
@@ -15,6 +22,20 @@
 
 .tabs-container button:active {
   transform: translateY(1px);
+}
+
+.tab-content {
+  overflow: visible;
+}
+
+@media (max-width: 767px) {
+  .tab-content {
+    overflow-x: hidden;
+  }
+
+  .gradebook-tab {
+    overflow-x: visible;
+  }
 }
 
 .tab-content {

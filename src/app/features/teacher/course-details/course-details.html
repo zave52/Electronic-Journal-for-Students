@@ -1,4 +1,4 @@
-<div class="teacher-course-details-container p-6 max-w-7xl mx-auto">
+<div class="teacher-course-details-container px-2 py-4 sm:p-6 max-w-7xl mx-auto">
   @if (error) {
     <app-error-message
       [message]="'Failed to load course details. Please try again later.'"
@@ -12,13 +12,13 @@
 
   <div *ngIf="course$ | async as course">
     <div class="page-header mb-6">
-      <h1 class="text-3xl font-bold text-gray-900">{{ course.name }}</h1>
-      <p class="text-gray-600 mt-2">{{ course.description }}</p>
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 break-words">{{ course.name }}</h1>
+      <p class="text-gray-600 mt-2 break-words">{{ course.description }}</p>
     </div>
 
     <div class="tabs-container mb-6">
       <div class="border-b border-gray-200">
-        <nav class="flex space-x-8" aria-label="Tabs">
+        <nav class="flex gap-4 sm:gap-8" aria-label="Tabs">
           <button
             (click)="switchTab('information')"
             [class.border-blue-500]="isActiveTab('information')"
@@ -26,7 +26,7 @@
             [class.border-transparent]="!isActiveTab('information')"
             [class.text-gray-500]="!isActiveTab('information')"
             [class.hover:text-gray-700]="!isActiveTab('information')"
-            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+            class="whitespace-nowrap py-4 border-b-2 font-medium text-sm transition-colors">
             <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -41,7 +41,7 @@
             [class.border-transparent]="!isActiveTab('lessons')"
             [class.text-gray-500]="!isActiveTab('lessons')"
             [class.hover:text-gray-700]="!isActiveTab('lessons')"
-            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+            class="whitespace-nowrap py-4 border-b-2 font-medium text-sm transition-colors">
             <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
@@ -56,7 +56,7 @@
             [class.border-transparent]="!isActiveTab('gradebook')"
             [class.text-gray-500]="!isActiveTab('gradebook')"
             [class.hover:text-gray-700]="!isActiveTab('gradebook')"
-            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+            class="whitespace-nowrap py-4 border-b-2 font-medium text-sm transition-colors">
             <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
@@ -67,18 +67,16 @@
       </div>
     </div>
 
-    <div class="tab-content bg-white rounded-lg border border-gray-200 p-6"
-         style="overflow: visible !important; height: auto !important; max-height: none !important;">
-      <div *ngIf="isActiveTab('information')" class="information-tab" style="overflow: visible !important;">
+    <div class="tab-content bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div *ngIf="isActiveTab('information')" class="information-tab">
         <app-course-info [course]="course"></app-course-info>
       </div>
 
-      <div *ngIf="isActiveTab('lessons')" class="lessons-tab" style="overflow: visible !important;">
+      <div *ngIf="isActiveTab('lessons')" class="lessons-tab">
         <app-lessons-assignments [courseId]="courseId"></app-lessons-assignments>
       </div>
 
-      <div *ngIf="isActiveTab('gradebook')" class="gradebook-tab"
-           style="overflow: visible !important; height: auto !important; max-height: none !important;">
+      <div *ngIf="isActiveTab('gradebook')" class="gradebook-tab">
         <app-gradebook [courseId]="courseId"></app-gradebook>
       </div>
     </div>
