@@ -40,7 +40,7 @@ export class CourseDetails implements OnInit {
     }
 
     const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
+    if (id && id.toLowerCase() !== 'nan') {
       this.courseId = id;
       this.loadCourse();
     } else {

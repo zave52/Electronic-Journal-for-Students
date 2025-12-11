@@ -74,7 +74,8 @@ export class Assignments implements OnInit, OnChanges {
     this.isLoading = true;
     this.error = null;
 
-    this.assignments$ = this.http.get<any[]>(`${environment.apiUrl}/grades?studentId=${this.currentStudentId}`).pipe(
+    this.assignments$ = this.taskService.cleanupDuplicateStatuses(this.currentStudentId).pipe(
+      switchMap(() => this.http.get<any[]>(`${environment.apiUrl}/grades?studentId=${this.currentStudentId}`)),
       switchMap(grades => {
         this.gradedAssignmentIds.clear();
         grades.forEach(grade => {

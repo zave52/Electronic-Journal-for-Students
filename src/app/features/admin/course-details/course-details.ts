@@ -71,8 +71,8 @@ export class CourseDetails implements OnInit {
 
     this.userService.getUsers().subscribe({
       next: (users) => {
-        this.teachers.set(users.filter(u => u.role === 'teacher'));
-        this.students.set(users.filter(u => u.role === 'student'));
+        this.teachers.set((users || []).filter(u => u.role === 'teacher'));
+        this.students.set((users || []).filter(u => u.role === 'student'));
         this.loadCourseAndEnrollments(courseId);
       },
       error: (error) => {

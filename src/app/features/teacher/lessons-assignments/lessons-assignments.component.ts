@@ -3,9 +3,10 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AssignmentService } from '../../../core';
 import { Assignment, Lesson } from '../../../core/models';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
-import { finalize } from 'rxjs/operators';
+import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { ModalComponent } from '../../../shared/ui/modal/modal.component';
+import { forkJoin, of } from 'rxjs';
 
 interface LessonWithAssignments extends Lesson {
   assignments: Assignment[];
@@ -66,29 +67,47 @@ export class LessonsAssignmentsComponent implements OnInit {
     this.error.set(null);
 
     this.assignmentService.getLessons(this.courseId).pipe(
-      finalize(() => this.loading.set(false))
-    ).subscribe({
-      next: (lessons) => {
+      catchError(err => {
+        console.error('Error loading lessons:', err);
+        this.error.set('Failed to load lessons. The "lessons" table may be missing in db.json.');
+        return of([]);
+      }),
+      switchMap(lessons => {
+        if (lessons.length === 0) {
+          return of([]);
+        }
         const lessonsWithAssignments: LessonWithAssignments[] = lessons.map(lesson => ({
           ...lesson,
           assignments: [],
           expanded: false
         }));
 
-        lessonsWithAssignments.forEach(lesson => {
-          this.assignmentService.getAssignmentsByLesson(lesson.id).subscribe({
-            next: (assignments) => {
-              lesson.assignments = assignments;
-              this.lessons.set([...this.lessons()]);
-            }
-          });
-        });
+        const assignmentRequests = lessonsWithAssignments.map(lesson =>
+          this.assignmentService.getAssignmentsByLesson(lesson.id).pipe(
+            catchError(err => {
+              console.warn(`Could not load assignments for lesson ${lesson.id}`, err);
+              return of([]);
+            })
+          )
+        );
 
+        return forkJoin(assignmentRequests).pipe(
+          map(assignmentsArray => {
+            lessonsWithAssignments.forEach((lesson, index) => {
+              lesson.assignments = assignmentsArray[index];
+            });
+            return lessonsWithAssignments;
+          })
+        );
+      }),
+      finalize(() => this.loading.set(false))
+    ).subscribe({
+      next: (lessonsWithAssignments) => {
         this.lessons.set(lessonsWithAssignments);
       },
       error: (err) => {
-        console.error('Error loading lessons:', err);
-        this.error.set('Failed to load lessons');
+        console.error('An unexpected error occurred:', err);
+        this.error.set('An unexpected error occurred.');
       }
     });
   }

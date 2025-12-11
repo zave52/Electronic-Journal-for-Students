@@ -61,8 +61,8 @@ export class Courses implements OnInit {
     );
   }
 
-  openCourse(courseId: number | string): void {
-    this.router.navigate(['/teacher/courses', Number(courseId)]);
+  openCourse(courseId: string): void {
+    this.router.navigate(['/teacher/courses', courseId]);
   }
 
   retryLoad(): void {
