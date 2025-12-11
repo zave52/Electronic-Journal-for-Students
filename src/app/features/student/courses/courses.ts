@@ -16,7 +16,7 @@ class LocalCourseService {
   constructor(private http: HttpClient) {
   }
 
-  getCoursesByStudent(studentId: number) {
+  getCoursesByStudent(studentId: string) {
     return this.http.get<any[]>(`${environment.apiUrl}/enrollments?studentId=${studentId}`)
       .pipe(
         switchMap(enrollments => {
@@ -75,6 +75,10 @@ export class Courses implements OnInit {
     }
 
     const id = this.auth.getCurrentUserId();
+    if (!id) {
+      this.error = 'Could not identify current user.';
+      return;
+    }
 
     this.loading = true;
     this.error = null;
@@ -91,8 +95,8 @@ export class Courses implements OnInit {
     );
   }
 
-  openCourse(id: number | string) {
-    this.router.navigate(['/student/courses', Number(id)]);
+  openCourse(id: string) {
+    this.router.navigate(['/student/courses', id]);
   }
 
   retryLoad(): void {

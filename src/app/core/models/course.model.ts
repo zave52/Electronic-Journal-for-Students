@@ -1,7 +1,7 @@
 export interface Course {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   syllabus?: string;
-  teacherId: number;
+  teacherId?: string | null;
 }

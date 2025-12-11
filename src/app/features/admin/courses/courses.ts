@@ -32,8 +32,11 @@ export class Courses implements OnInit {
 
   getTeacherName = computed(() => {
     const users = this.users();
-    return (teacherId: number) => {
-      const teacher = users.find(u => Number(u.id) === Number(teacherId));
+    return (teacherId: string | null | undefined) => {
+      if (teacherId == null) {
+        return 'Unassigned';
+      }
+      const teacher = users.find(u => u.id === teacherId);
       return teacher?.name || 'Unassigned';
     };
   });
@@ -87,8 +90,8 @@ export class Courses implements OnInit {
     this.loadData();
   }
 
-  getStudentCount(courseId: number): number {
-    return this.enrollments().filter(e => Number(e.courseId) === Number(courseId)).length;
+  getStudentCount(courseId: string): number {
+    return this.enrollments().filter(e => e.courseId === courseId).length;
   }
 
   onEdit(course: Course): void {

@@ -89,15 +89,15 @@ export class AuthService {
     return user ? user.role : null;
   }
 
-  getCurrentUserId(): number {
+  getCurrentUserId(): string | null {
     const user = localStorage.getItem('currentUser');
 
-    if (!user) return 0;
+    if (!user) return null;
 
     try {
       return JSON.parse(user).id;
     } catch (e) {
-      return 0;
+      return null;
     }
   }
 

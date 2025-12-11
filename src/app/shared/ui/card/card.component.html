@@ -1,8 +1,10 @@
-<div class="card-container" [class]="class()">
+<div class="card-container" [ngClass]="class()">
   @if (title()) {
     <div class="card-header">
       <h3 class="card-title">{{ title() }}</h3>
     </div>
   }
-  <ng-content></ng-content>
+  <div class="card-content">
+    <ng-content></ng-content>
+  </div>
 </div>

@@ -61,7 +61,7 @@ export class CourseFormComponent implements OnInit {
         name: formValue.name,
         description: formValue.description,
         syllabus: formValue.syllabus,
-        teacherId: Number(formValue.teacherId)
+        teacherId: formValue.teacherId
       };
 
       if (this.isEditMode() && this.course()?.id) {

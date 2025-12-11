@@ -5,7 +5,8 @@ import { Course, Enrollment, User } from '../../../core/models';
 import { CourseService, EnrollmentService, UserService } from '../../../core/services';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 import { CardComponent } from '../../../shared/ui/card/card.component';
 
@@ -29,7 +30,7 @@ export class CourseDetails implements OnInit {
   enrollments = signal<Enrollment[]>([]);
   isLoading = signal(false);
   isSaving = signal(false);
-  isEnrolling = signal<number | null>(null);
+  isEnrolling = signal<string | null>(null);
   successMessage = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
 
@@ -39,9 +40,11 @@ export class CourseDetails implements OnInit {
     const currentCourse = this.course();
     const allTeachers = this.teachers();
 
-    if (!currentCourse) return 'No teacher assigned';
+    if (!currentCourse?.teacherId) {
+      return 'No teacher assigned';
+    }
 
-    const teacher = allTeachers.find(t => Number(t.id) === Number(currentCourse.teacherId));
+    const teacher = allTeachers.find(t => t.id === currentCourse.teacherId);
     return teacher?.name || 'No teacher assigned';
   });
 
@@ -68,9 +71,9 @@ export class CourseDetails implements OnInit {
 
     this.userService.getUsers().subscribe({
       next: (users) => {
-        this.teachers.set(users.filter(u => u.role === 'teacher'));
-        this.students.set(users.filter(u => u.role === 'student'));
-        this.loadCourseAndEnrollments(Number(courseId));
+        this.teachers.set((users || []).filter(u => u.role === 'teacher'));
+        this.students.set((users || []).filter(u => u.role === 'student'));
+        this.loadCourseAndEnrollments(courseId);
       },
       error: (error) => {
         console.error('Error loading users:', error);
@@ -80,16 +83,30 @@ export class CourseDetails implements OnInit {
     });
   }
 
-  private loadCourseAndEnrollments(courseId: number): void {
+  private loadCourseAndEnrollments(courseId: string): void {
     forkJoin({
-      course: this.courseService.getCourseById(courseId),
-      enrollments: this.enrollmentService.getEnrollmentsByCourse(courseId)
+      course: this.courseService.getCourseById(courseId).pipe(
+        catchError(err => {
+          console.error('Failed to load course', err);
+          return of(null);
+        })
+      ),
+      enrollments: this.enrollmentService.getEnrollmentsByCourse(courseId).pipe(
+        catchError(err => {
+          console.error('Failed to load enrollments', err);
+          return of([]);
+        })
+      )
     }).subscribe({
       next: ({ course, enrollments }) => {
-        console.log('Loaded course:', course);
-        console.log('Loaded enrollments:', enrollments);
+        if (!course) {
+          this.errorMessage.set('Failed to load course details');
+          this.isLoading.set(false);
+          return;
+        }
+
         this.course.set(course);
-        this.enrollments.set(enrollments);
+        this.enrollments.set(enrollments || []);
 
         if (course.teacherId) {
           this.teacherForm.patchValue({
@@ -98,17 +115,12 @@ export class CourseDetails implements OnInit {
         }
 
         this.isLoading.set(false);
-      },
-      error: (error) => {
-        console.error('Error loading course data:', error);
-        this.errorMessage.set('Failed to load course details');
-        this.isLoading.set(false);
       }
     });
   }
 
-  isStudentEnrolled(studentId: number): boolean {
-    return this.enrollments().some(e => Number(e.studentId) === Number(studentId));
+  isStudentEnrolled(studentId: string): boolean {
+    return this.enrollments().some(e => e.studentId === studentId);
   }
 
   onEnrollmentChange(student: User, event: Event): void {
@@ -118,14 +130,14 @@ export class CourseDetails implements OnInit {
 
     if (!currentCourse) return;
 
-    this.isEnrolling.set(Number(student.id));
+    this.isEnrolling.set(student.id);
     this.successMessage.set(null);
     this.errorMessage.set(null);
 
     if (isChecked) {
       const enrollment: Partial<Enrollment> = {
-        courseId: Number(currentCourse.id),
-        studentId: Number(student.id)
+        courseId: currentCourse.id,
+        studentId: student.id
       };
 
       this.enrollmentService.createEnrollment(enrollment).subscribe({
@@ -145,7 +157,7 @@ export class CourseDetails implements OnInit {
       });
     } else {
       const enrollment = this.enrollments().find(
-        e => Number(e.studentId) === Number(student.id) && Number(e.courseId) === Number(currentCourse.id)
+        e => e.studentId === student.id && e.courseId === currentCourse.id
       );
 
       if (!enrollment) {
@@ -158,7 +170,7 @@ export class CourseDetails implements OnInit {
         next: () => {
           console.log('Student unenrolled successfully');
           this.enrollments.update(enrollments =>
-            enrollments.filter(e => String(e.id) !== String(enrollment.id))
+            enrollments.filter(e => e.id !== enrollment.id)
           );
           this.successMessage.set(`${student.name} unenrolled successfully!`);
           this.isEnrolling.set(null);
@@ -199,7 +211,7 @@ export class CourseDetails implements OnInit {
       name: currentCourse.name,
       description: currentCourse.description,
       syllabus: currentCourse.syllabus,
-      teacherId: Number(this.teacherForm.value.teacherId)
+      teacherId: this.teacherForm.value.teacherId
     };
 
     this.courseService.updateCourse(updatedCourse).subscribe({
@@ -225,15 +237,15 @@ export class CourseDetails implements OnInit {
 
   isTeacherChanged(): boolean {
     const currentCourse = this.course();
-    if (!currentCourse) return false;
+    if (!currentCourse) {
+      return false;
+    }
 
-    const formTeacherId = Number(this.teacherForm.value.teacherId);
-    const currentTeacherId = Number(currentCourse.teacherId);
+    const formTeacherId = this.teacherForm.value.teacherId;
+    const currentTeacherId = currentCourse.teacherId;
 
-    return formTeacherId !== currentTeacherId;
-  }
+    const normalizedCurrentId = currentTeacherId ?? null;
 
-  Number(value: any): number {
-    return Number(value);
+    return formTeacherId !== normalizedCurrentId;
   }
 }

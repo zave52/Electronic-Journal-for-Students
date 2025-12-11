@@ -8,13 +8,15 @@ import { environment } from '../../../../environments/environment';
 import { RouterLink } from '@angular/router';
 import { LoaderComponent, ErrorMessageComponent } from '../../../shared';
 import { CardComponent } from '../../../shared/ui/card/card.component';
+import { Course, Grade } from '../../../core/models';
+import { Assignment } from '../../../core/models/assignment.model';
 
 interface EnrichedGrade {
-  id: number;
+  id: string;
   grade: number;
-  assignmentId: number;
+  assignmentId: string;
   assignmentName: string;
-  courseId: number;
+  courseId: string;
   courseName: string;
 }
 
@@ -62,13 +64,13 @@ export class Grades implements OnInit {
     }
 
     this.gradeService.getGradesByStudentId(currentStudentId).pipe(
-      switchMap(grades => {
+      switchMap((grades: Grade[]) => {
         if (!grades || grades.length === 0) {
           return of([]);
         }
 
-        const courseIds = [...new Set(grades.map(g => Number(g.courseId)))];
-        const assignmentIds = [...new Set(grades.map(g => Number(g.assignmentId)))];
+        const courseIds = [...new Set(grades.map(g => g.courseId))];
+        const assignmentIds = [...new Set(grades.map(g => g.assignmentId))];
 
         return forkJoin({
           courses: this.fetchCourses(courseIds),
@@ -76,16 +78,16 @@ export class Grades implements OnInit {
           grades: of(grades)
         }).pipe(
           map(({ courses, assignments, grades }) => {
-            const courseMap = new Map((courses as any[]).map((c: any) => [Number(c.id), c.name]));
-            const assignmentMap = new Map((assignments as any[]).map((a: any) => [Number(a.id), a.title]));
+            const courseMap = new Map(courses.map((c: Course) => [c.id, c.name]));
+            const assignmentMap = new Map(assignments.map((a: Assignment) => [a.id, a.title]));
 
             return grades.map(g => ({
-              id: Number(g.id),
+              id: g.id,
               grade: g.grade,
-              assignmentId: Number(g.assignmentId),
-              assignmentName: assignmentMap.get(Number(g.assignmentId)) || 'Unknown Assignment',
-              courseId: Number(g.courseId),
-              courseName: courseMap.get(Number(g.courseId)) || 'Unknown Course'
+              assignmentId: g.assignmentId,
+              assignmentName: assignmentMap.get(g.assignmentId) || 'Unknown Assignment',
+              courseId: g.courseId,
+              courseName: courseMap.get(g.courseId) || 'Unknown Course'
             } as EnrichedGrade));
           })
         );
@@ -101,7 +103,7 @@ export class Grades implements OnInit {
     });
   }
 
-  private fetchCourses(courseIds: number[]): Observable<any[]> {
+  private fetchCourses(courseIds: string[]): Observable<Course[]> {
     if (courseIds.length === 0) return of([]);
 
     const requests = courseIds.map(id =>
@@ -109,19 +111,19 @@ export class Grades implements OnInit {
     );
 
     return forkJoin(requests).pipe(
-      map(courses => courses.filter(c => c !== null))
+      map(courses => courses.filter((c): c is Course => c !== null))
     );
   }
 
-  private fetchAssignments(assignmentIds: number[]): Observable<any[]> {
+  private fetchAssignments(assignmentIds: string[]): Observable<Assignment[]> {
     if (assignmentIds.length === 0) return of([]);
 
     const requests = assignmentIds.map(id =>
-      this.http.get(`${environment.apiUrl}/assignments/${id}`).pipe(catchError(() => of(null)))
+      this.http.get<Assignment>(`${environment.apiUrl}/assignments/${id}`).pipe(catchError(() => of(null)))
     );
 
     return forkJoin(requests).pipe(
-      map(assignments => assignments.filter(a => a !== null))
+      map(assignments => assignments.filter((a): a is Assignment => a !== null))
     );
   }
 

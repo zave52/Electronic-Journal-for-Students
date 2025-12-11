@@ -15,7 +15,7 @@ export class EnrollmentService {
     return this.http.get<Enrollment[]>(this.apiUrl);
   }
 
-  getEnrollmentsByCourse(courseId: number): Observable<Enrollment[]> {
+  getEnrollmentsByCourse(courseId: string): Observable<Enrollment[]> {
     return this.http.get<Enrollment[]>(`${this.apiUrl}?courseId=${courseId}`);
   }
 
@@ -23,11 +23,11 @@ export class EnrollmentService {
     return this.http.post<Enrollment>(this.apiUrl, enrollment);
   }
 
-  deleteEnrollment(id: number | string): Observable<void> {
+  deleteEnrollment(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  getEnrollmentByStudentAndCourse(studentId: number, courseId: number): Observable<Enrollment[]> {
+  getEnrollmentByStudentAndCourse(studentId: string, courseId: string): Observable<Enrollment[]> {
     return this.http.get<Enrollment[]>(`${this.apiUrl}?studentId=${studentId}&courseId=${courseId}`);
   }
 }

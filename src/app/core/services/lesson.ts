@@ -11,11 +11,11 @@ export class LessonService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/lessons`;
 
-  getLessons(courseId: number): Observable<Lesson[]> {
+  getLessons(courseId: string): Observable<Lesson[]> {
     return this.http.get<Lesson[]>(`${this.apiUrl}?courseId=${courseId}`);
   }
 
-  getLessonById(lessonId: number): Observable<Lesson> {
+  getLessonById(lessonId: string): Observable<Lesson> {
     return this.http.get<Lesson>(`${this.apiUrl}/${lessonId}`);
   }
 
@@ -27,7 +27,7 @@ export class LessonService {
     return this.http.put<Lesson>(`${this.apiUrl}/${lesson.id}`, lesson);
   }
 
-  deleteLesson(id: number): Observable<void> {
+  deleteLesson(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

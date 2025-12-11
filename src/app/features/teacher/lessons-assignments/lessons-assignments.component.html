@@ -299,7 +299,8 @@
         Cancel
       </app-button>
       <app-button
-        type="submit"
+        type="button"
+        (click)="saveAssignment()"
         [disabled]="assignmentForm.invalid"
         [loading]="savingAssignment()">
         Save

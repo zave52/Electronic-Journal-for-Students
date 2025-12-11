@@ -5,22 +5,22 @@ import { map, switchMap, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface AssignmentStatus {
-  id: number;
-  studentId: number;
-  assignmentId: number;
+  id: string;
+  studentId: string;
+  assignmentId: string;
   completed: boolean;
 }
 
 export interface StudentTask {
-  id: number;
-  lessonId: number;
-  courseId: number;
+  id: string;
+  lessonId: string;
+  courseId: string;
   title: string;
   instructions: string;
   deadline: string;
   courseName?: string;
   completed: boolean;
-  statusId?: number;
+  statusId?: string;
 }
 
 @Injectable({
@@ -30,7 +30,7 @@ export class StudentTaskService {
   private http = inject(HttpClient);
   private apiUrl = environment.apiUrl;
 
-  getAllAssignmentsForStudent(studentId: number): Observable<StudentTask[]> {
+  getAllAssignmentsForStudent(studentId: string): Observable<StudentTask[]> {
     console.log('[StudentTaskService] Getting assignments for student:', studentId);
 
     return this.http.get<any[]>(`${this.apiUrl}/enrollments?studentId=${studentId}`).pipe(
@@ -51,86 +51,42 @@ export class StudentTaskService {
           statuses: this.http.get<AssignmentStatus[]>(`${this.apiUrl}/assignmentStatuses?studentId=${studentId}`),
           grades: this.http.get<any[]>(`${this.apiUrl}/grades?studentId=${studentId}`)
         }).pipe(
-          switchMap(({ courses, assignments, statuses, grades }) => {
+          map(({ courses, assignments, statuses, grades }) => {
             console.log('[StudentTaskService] Courses:', courses);
             console.log('[StudentTaskService] Assignments:', assignments);
             console.log('[StudentTaskService] Statuses:', statuses);
             console.log('[StudentTaskService] Grades:', grades);
 
-            const courseMap = new Map<number, string>();
+            const courseMap = new Map<string, string>();
             courses.forEach((course: any) => {
-              courseMap.set(Number(course.id), course.name);
+              courseMap.set(course.id, course.name);
             });
 
-            const statusMap = new Map<number, AssignmentStatus>();
+            const statusMap = new Map<string, AssignmentStatus>();
             statuses.forEach(status => {
-              statusMap.set(Number(status.assignmentId), status);
-            });
-
-            const gradedAssignmentIds = new Set<number>();
-            grades.forEach(grade => {
-              gradedAssignmentIds.add(Number(grade.assignmentId));
-            });
-
-            const updateRequests: Observable<any>[] = [];
-
-            assignments.forEach((assignment: any) => {
-              const assignmentId = Number(assignment.id);
-              const hasGrade = gradedAssignmentIds.has(assignmentId);
-              const status = statusMap.get(assignmentId);
-
-              if (hasGrade) {
-                if (!status) {
-                  console.log('[StudentTaskService] Creating completed status for graded assignment:', assignmentId);
-                  updateRequests.push(
-                    this.createTaskStatus(studentId, assignmentId, true)
-                  );
-                } else if (!status.completed) {
-                  console.log('[StudentTaskService] Updating status to completed for graded assignment:', assignmentId);
-                  updateRequests.push(
-                    this.updateTaskStatus(status.id, true)
-                  );
-                }
+              if (!statusMap.has(status.assignmentId)) {
+                statusMap.set(status.assignmentId, status);
               }
             });
 
-            if (updateRequests.length > 0) {
-              return forkJoin(updateRequests).pipe(
-                switchMap(() => {
-                  return this.http.get<AssignmentStatus[]>(`${this.apiUrl}/assignmentStatuses?studentId=${studentId}`).pipe(
-                    map(updatedStatuses => {
-                      statusMap.clear();
-                      updatedStatuses.forEach(status => {
-                        statusMap.set(Number(status.assignmentId), status);
-                      });
-                      return { courses, assignments, statusMap, gradedAssignmentIds };
-                    })
-                  );
-                })
-              );
-            } else {
-              return of({ courses, assignments, statusMap, gradedAssignmentIds });
-            }
-          }),
-          map(({ courses, assignments, statusMap, gradedAssignmentIds }) => {
-            const courseMap = new Map<number, string>();
-            courses.forEach((course: any) => {
-              courseMap.set(Number(course.id), course.name);
+            const gradedAssignmentIds = new Set<string>();
+            grades.forEach(grade => {
+              gradedAssignmentIds.add(grade.assignmentId);
             });
 
             const tasks = assignments.map((assignment: any) => {
-              const assignmentId = Number(assignment.id);
+              const assignmentId = assignment.id;
               const status = statusMap.get(assignmentId);
               const hasGrade = gradedAssignmentIds.has(assignmentId);
 
               return {
                 id: assignmentId,
-                lessonId: Number(assignment.lessonId),
-                courseId: Number(assignment.courseId),
+                lessonId: assignment.lessonId,
+                courseId: assignment.courseId,
                 title: assignment.title,
                 instructions: assignment.instructions,
                 deadline: assignment.deadline,
-                courseName: courseMap.get(Number(assignment.courseId)) || 'Unknown Course',
+                courseName: courseMap.get(assignment.courseId) || 'Unknown Course',
                 completed: hasGrade ? true : (status?.completed || false),
                 statusId: status?.id
               } as StudentTask;
@@ -148,29 +104,70 @@ export class StudentTaskService {
     );
   }
 
-  updateTaskStatus(statusId: number, completed: boolean): Observable<AssignmentStatus> {
+  updateTaskStatus(statusId: string, completed: boolean): Observable<AssignmentStatus> {
     return this.http.patch<AssignmentStatus>(
       `${this.apiUrl}/assignmentStatuses/${statusId}`,
       { completed }
     );
   }
 
-  createTaskStatus(studentId: number, assignmentId: number, completed: boolean): Observable<AssignmentStatus> {
+  createTaskStatus(studentId: string, assignmentId: string, completed: boolean): Observable<AssignmentStatus> {
     return this.http.post<AssignmentStatus>(
       `${this.apiUrl}/assignmentStatuses`,
       { studentId, assignmentId, completed }
     );
   }
 
-  toggleTaskCompletion(studentId: number, assignmentId: number, statusId?: number, currentCompleted?: boolean): Observable<AssignmentStatus> {
+  toggleTaskCompletion(studentId: string, assignmentId: string, statusId?: string, currentCompleted?: boolean): Observable<AssignmentStatus> {
     if (statusId) {
       return this.updateTaskStatus(statusId, !currentCompleted);
     } else {
-      return this.createTaskStatus(studentId, assignmentId, true);
+      return this.http.get<AssignmentStatus[]>(`${this.apiUrl}/assignmentStatuses?studentId=${studentId}&assignmentId=${assignmentId}`).pipe(
+        switchMap(statuses => {
+          if (statuses.length > 0) {
+            const statusToUpdate = statuses[0];
+            return this.updateTaskStatus(statusToUpdate.id, !statusToUpdate.completed);
+          } else {
+            return this.createTaskStatus(studentId, assignmentId, true);
+          }
+        })
+      );
     }
   }
 
-  private getCoursesByIds(courseIds: number[]): Observable<any[]> {
+  cleanupDuplicateStatuses(studentId: string): Observable<any> {
+    return this.http.get<AssignmentStatus[]>(`${this.apiUrl}/assignmentStatuses?studentId=${studentId}`).pipe(
+      switchMap(statuses => {
+        const statusesByAssignment = new Map<string, AssignmentStatus[]>();
+        statuses.forEach(status => {
+          if (!statusesByAssignment.has(status.assignmentId)) {
+            statusesByAssignment.set(status.assignmentId, []);
+          }
+          statusesByAssignment.get(status.assignmentId)!.push(status);
+        });
+
+        const deleteObservables: Observable<any>[] = [];
+        statusesByAssignment.forEach(statusGroup => {
+          if (statusGroup.length > 1) {
+            // Keep the first one (sorted by id to be consistent), delete the rest
+            const sortedStatuses = statusGroup.sort((a, b) => a.id.localeCompare(b.id));
+            const statusesToDelete = sortedStatuses.slice(1);
+            statusesToDelete.forEach(s => {
+              deleteObservables.push(this.http.delete(`${this.apiUrl}/assignmentStatuses/${s.id}`));
+            });
+          }
+        });
+
+        if (deleteObservables.length > 0) {
+          return forkJoin(deleteObservables);
+        } else {
+          return of(null); // Nothing to delete
+        }
+      })
+    );
+  }
+
+  private getCoursesByIds(courseIds: string[]): Observable<any[]> {
     if (courseIds.length === 0) {
       return of([]);
     }
@@ -186,7 +183,7 @@ export class StudentTaskService {
     );
   }
 
-  private getAssignmentsByCourseIds(courseIds: number[]): Observable<any[]> {
+  private getAssignmentsByCourseIds(courseIds: string[]): Observable<any[]> {
     if (courseIds.length === 0) {
       return of([]);
     }
