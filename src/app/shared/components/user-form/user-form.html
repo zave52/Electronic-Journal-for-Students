@@ -84,7 +84,8 @@
       Cancel
     </app-button>
     <app-button
-      type="submit"
+      type="button"
+      (click)="onSubmit()"
       [disabled]="form.invalid"
       class="order-1 sm:order-2">
       {{ isEditMode() ? 'Update User' : 'Create User' }}
