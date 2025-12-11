@@ -8,12 +8,14 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
+import { Course, Grade, User } from '../../../core/models';
+import { Assignment } from '../../../core/models/assignment.model';
 
 interface CourseDetailsData {
-  course: any;
-  teacher: any;
-  assignments: any[];
-  grades: Map<number, number>;
+  course: Course;
+  teacher: User | null;
+  assignments: Assignment[];
+  grades: Map<string, number>;
 }
 
 @Component({
@@ -46,12 +48,12 @@ export class StudentCourseDetailsPageComponent implements OnInit {
     }
 
     this.error = null;
-    const courseId = Number(this.route.snapshot.paramMap.get('id'));
+    const courseId = this.route.snapshot.paramMap.get('id');
     const currentUser = this.authService.getCurrentUser();
     const studentId = currentUser?.id;
 
-    if (!studentId) {
-      this.error = 'Unable to determine current user';
+    if (!studentId || !courseId) {
+      this.error = 'Unable to determine current user or course';
       return;
     }
 
@@ -59,36 +61,38 @@ export class StudentCourseDetailsPageComponent implements OnInit {
     this.courseData$ = this.loadCourseData(courseId, studentId);
   }
 
-  private loadCourseData(courseId: number, studentId: number): Observable<CourseDetailsData> {
+  private loadCourseData(courseId: string, studentId: string): Observable<CourseDetailsData> {
     return this.courseService.getCourseById(courseId).pipe(
       switchMap(course => {
-        // Fetch teacher, assignments, and grades in parallel
+        const teacherObs = course.teacherId
+          ? this.userService.getUserById(course.teacherId).pipe(
+            catchError(() => of(null))
+          )
+          : of(null);
+
         return forkJoin({
           course: of(course),
-          teacher: this.userService.getUserById(course.teacherId).pipe(
-            catchError(() => of({ name: 'Unknown Teacher' }))
-          ),
-          assignments: this.http.get<any[]>(`${environment.apiUrl}/assignments?courseId=${courseId}`).pipe(
+          teacher: teacherObs,
+          assignments: this.http.get<Assignment[]>(`${environment.apiUrl}/assignments?courseId=${courseId}`).pipe(
             catchError(() => of([]))
           ),
           grades: this.gradeService.getGradesByStudentId(studentId).pipe(
-            map(grades => {
-              // Create a map of assignmentId -> grade
-              const gradeMap = new Map<number, number>();
+            map((grades: Grade[]) => {
+              const gradeMap = new Map<string, number>();
               grades.forEach(g => {
-                if (Number(g.courseId) === courseId) {
-                  gradeMap.set(Number(g.assignmentId), g.grade);
+                if (g.courseId === courseId) {
+                  gradeMap.set(g.assignmentId, g.grade);
                 }
               });
               return gradeMap;
             }),
-            catchError(() => of(new Map<number, number>()))
+            catchError(() => of(new Map<string, number>()))
           )
         });
       }),
       map(data => {
         this.loading = false;
-        return data;
+        return data as CourseDetailsData;
       }),
       catchError(err => {
         console.error('Error loading course details:', err);
@@ -99,16 +103,17 @@ export class StudentCourseDetailsPageComponent implements OnInit {
           teacher: null,
           assignments: [],
           grades: new Map()
-        } as CourseDetailsData);
+        } as unknown as CourseDetailsData);
       })
     );
   }
 
-  getGradeForAssignment(assignmentId: number, gradesMap: Map<number, number>): number | null {
-    return gradesMap.get(Number(assignmentId)) || null;
+  getGradeForAssignment(assignmentId: string, gradesMap: Map<string, number>): number | null {
+    return gradesMap.get(assignmentId) || null;
   }
 
   retryLoad(): void {
     this.ngOnInit();
   }
 }
+

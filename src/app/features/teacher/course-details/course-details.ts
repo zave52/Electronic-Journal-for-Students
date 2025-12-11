@@ -24,7 +24,7 @@ export class CourseDetails implements OnInit {
   course$!: Observable<Course | null>;
   loading = false;
   error: string | null = null;
-  courseId!: number;
+  courseId!: string;
   activeTab: TabName = 'information';
 
   constructor(
@@ -41,7 +41,7 @@ export class CourseDetails implements OnInit {
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.courseId = Number(id);
+      this.courseId = id;
       this.loadCourse();
     } else {
       this.error = 'Course ID not provided';

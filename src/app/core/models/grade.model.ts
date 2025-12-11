@@ -1,8 +1,8 @@
 export interface Grade {
-  id: number;
-  studentId: number;
-  assignmentId: number;
-  courseId: number;
+  id: string;
+  studentId: string;
+  assignmentId: string;
+  courseId: string;
   grade: number;
 }
 

@@ -20,7 +20,7 @@ interface LessonWithAssignments extends Lesson {
   styleUrl: './lessons-assignments.component.css',
 })
 export class LessonsAssignmentsComponent implements OnInit {
-  @Input() courseId!: number;
+  @Input() courseId!: string;
 
   lessons = signal<LessonWithAssignments[]>([]);
   loading = signal(false);
@@ -30,7 +30,7 @@ export class LessonsAssignmentsComponent implements OnInit {
   showAssignmentModal = signal(false);
   editingLesson = signal<Lesson | null>(null);
   editingAssignment = signal<Assignment | null>(null);
-  currentLessonId = signal<number | null>(null);
+  currentLessonId = signal<string | null>(null);
 
   lessonForm!: FormGroup;
   assignmentForm!: FormGroup;
@@ -162,7 +162,7 @@ export class LessonsAssignmentsComponent implements OnInit {
     });
   }
 
-  openCreateAssignmentModal(lessonId: number): void {
+  openCreateAssignmentModal(lessonId: string): void {
     this.currentLessonId.set(lessonId);
     this.editingAssignment.set(null);
     this.assignmentForm.reset();

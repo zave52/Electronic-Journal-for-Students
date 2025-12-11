@@ -3,13 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { EMPTY, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { Course } from '../models';
-
-interface Enrollment {
-  id: number;
-  studentId: number;
-  courseId: number;
-}
+import { Course, Enrollment } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +16,7 @@ export class CourseService {
     return this.http.get<Course[]>(this.apiUrl);
   }
 
-  getCourseById(courseId: number): Observable<Course> {
+  getCourseById(courseId: string): Observable<Course> {
     return this.http.get<Course>(`${this.apiUrl}/${courseId}`);
   }
 
@@ -34,11 +28,11 @@ export class CourseService {
     return this.http.put<Course>(`${this.apiUrl}/${course.id}`, course);
   }
 
-  deleteCourse(id: number): Observable<void> {
+  deleteCourse(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  getCoursesByStudentId(studentId: number): Observable<Course[]> {
+  getCoursesByStudentId(studentId: string): Observable<Course[]> {
     return this.http.get<Enrollment[]>(`${environment.apiUrl}/enrollments?studentId=${studentId}`).pipe(
       map(enrollments => enrollments.map(e => e.courseId)),
       switchMap(courseIds => {
@@ -51,11 +45,11 @@ export class CourseService {
     );
   }
 
-  getCoursesByTeacherId(teacherId: number): Observable<Course[]> {
+  getCoursesByTeacherId(teacherId: string): Observable<Course[]> {
     return this.http.get<Course[]>(`${this.apiUrl}?teacherId=${teacherId}`);
   }
 
-  getLessonsByCourseId(courseId: number): Observable<any[]> {
+  getLessonsByCourseId(courseId: string): Observable<any[]> {
     return this.http.get<any[]>(`${environment.apiUrl}/lessons?courseId=${courseId}`);
   }
 }

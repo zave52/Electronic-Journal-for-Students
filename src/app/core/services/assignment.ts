@@ -11,11 +11,11 @@ export class AssignmentService {
   private http = inject(HttpClient);
   private apiUrl = environment.apiUrl;
 
-  getLessons(courseId: number): Observable<Lesson[]> {
+  getLessons(courseId: string): Observable<Lesson[]> {
     return this.http.get<Lesson[]>(`${this.apiUrl}/lessons?courseId=${courseId}`);
   }
 
-  getLessonById(lessonId: number): Observable<Lesson> {
+  getLessonById(lessonId: string): Observable<Lesson> {
     return this.http.get<Lesson>(`${this.apiUrl}/lessons/${lessonId}`);
   }
 
@@ -27,19 +27,19 @@ export class AssignmentService {
     return this.http.put<Lesson>(`${this.apiUrl}/lessons/${lesson.id}`, lesson);
   }
 
-  deleteLesson(id: number): Observable<void> {
+  deleteLesson(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/lessons/${id}`);
   }
 
-  getAssignments(courseId: number): Observable<Assignment[]> {
+  getAssignments(courseId: string): Observable<Assignment[]> {
     return this.http.get<Assignment[]>(`${this.apiUrl}/assignments?courseId=${courseId}`);
   }
 
-  getAssignmentsByLesson(lessonId: number): Observable<Assignment[]> {
+  getAssignmentsByLesson(lessonId: string): Observable<Assignment[]> {
     return this.http.get<Assignment[]>(`${this.apiUrl}/assignments?lessonId=${lessonId}`);
   }
 
-  getAssignmentById(assignmentId: number): Observable<Assignment> {
+  getAssignmentById(assignmentId: string): Observable<Assignment> {
     return this.http.get<Assignment>(`${this.apiUrl}/assignments/${assignmentId}`);
   }
 
@@ -51,15 +51,15 @@ export class AssignmentService {
     return this.http.put<Assignment>(`${this.apiUrl}/assignments/${assignment.id}`, assignment);
   }
 
-  deleteAssignment(id: number): Observable<void> {
+  deleteAssignment(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/assignments/${id}`);
   }
 
-  getAllAssignmentsForStudent(studentId: number): Observable<any[]> {
+  getAllAssignmentsForStudent(studentId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/assignments?studentId=${studentId}`);
   }
 
-  updateTaskStatus(assignmentId: number, isCompleted: boolean): Observable<any> {
+  updateTaskStatus(assignmentId: string, isCompleted: boolean): Observable<any> {
     return this.http.patch<any>(
       `${this.apiUrl}/assignments/${assignmentId}`,
       { isCompleted: isCompleted }

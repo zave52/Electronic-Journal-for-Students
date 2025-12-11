@@ -13,19 +13,19 @@ export class GradeService {
   constructor(private http: HttpClient) {
   }
 
-  getGradesByStudentId(studentId: number): Observable<Grade[]> {
+  getGradesByStudentId(studentId: string): Observable<Grade[]> {
     return this.http.get<Grade[]>(
       `${environment.apiUrl}/grades?studentId=${studentId}`
     );
   }
 
-  getGradesByCourseId(courseId: number): Observable<Grade[]> {
+  getGradesByCourseId(courseId: string): Observable<Grade[]> {
     return this.http.get<Grade[]>(
       `${environment.apiUrl}/grades?courseId=${courseId}`
     );
   }
 
-  getGradeByStudentAndAssignment(studentId: number, assignmentId: number): Observable<Grade | null> {
+  getGradeByStudentAndAssignment(studentId: string, assignmentId: string): Observable<Grade | null> {
     return this.http.get<Grade[]>(
       `${environment.apiUrl}/grades?studentId=${studentId}&assignmentId=${assignmentId}`
     ).pipe(
@@ -57,7 +57,7 @@ export class GradeService {
     );
   }
 
-  deleteGrade(gradeId: number): Observable<void> {
+  deleteGrade(gradeId: string): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/grades/${gradeId}`);
   }
 }

@@ -19,13 +19,13 @@ import { ErrorMessageComponent } from '../../../shared/components/error-message/
 })
 export class Assignments implements OnInit, OnChanges {
 
-  @Input() lessonId?: number | null;
+  @Input() lessonId?: string | null;
 
   assignments$!: Observable<StudentTask[]>;
   isLoading = false;
   error: string | null = null;
-  private currentStudentId: number | null = null;
-  private gradedAssignmentIds = new Set<number>();
+  private currentStudentId: string | null = null;
+  private gradedAssignmentIds = new Set<string>();
 
   constructor(
     private http: HttpClient,
@@ -48,7 +48,6 @@ export class Assignments implements OnInit, OnChanges {
       return;
     }
 
-    // Get current student ID
     const currentUser = this.authService.getCurrentUser();
     this.currentStudentId = currentUser?.id || null;
 
@@ -59,9 +58,8 @@ export class Assignments implements OnInit, OnChanges {
 
     if (this.lessonId == null) {
       const param = this.route.snapshot.paramMap.get('lessonId');
-      const parsed = param ? Number(param) : NaN;
-      if (!Number.isNaN(parsed) && parsed > 0) {
-        this.lessonId = parsed;
+      if (param) {
+        this.lessonId = param;
       }
     }
 
@@ -76,16 +74,13 @@ export class Assignments implements OnInit, OnChanges {
     this.isLoading = true;
     this.error = null;
 
-    // Fetch grades first to populate gradedAssignmentIds, then fetch assignments
     this.assignments$ = this.http.get<any[]>(`${environment.apiUrl}/grades?studentId=${this.currentStudentId}`).pipe(
       switchMap(grades => {
-        // Populate gradedAssignmentIds
         this.gradedAssignmentIds.clear();
         grades.forEach(grade => {
-          this.gradedAssignmentIds.add(Number(grade.assignmentId));
+          this.gradedAssignmentIds.add(grade.assignmentId);
         });
 
-        // Use StudentTaskService to get assignments with completion status
         return this.taskService.getAllAssignmentsForStudent(this.currentStudentId!);
       }),
       catchError(err => {
@@ -104,7 +99,6 @@ export class Assignments implements OnInit, OnChanges {
       return;
     }
 
-    // Prevent unchecking assignments that have grades
     if (this.hasGrade(task)) {
       return;
     }
@@ -133,7 +127,7 @@ export class Assignments implements OnInit, OnChanges {
     this.loadData();
   }
 
-  getAssignmentsByLessonId(lessonId: number): Observable<Assignment[]> {
+  getAssignmentsByLessonId(lessonId: string): Observable<Assignment[]> {
     return this.http.get<Assignment[]>(`${environment.apiUrl}/assignments?lessonId=${lessonId}`);
   }
 

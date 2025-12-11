@@ -1,6 +1,6 @@
 export interface Lesson {
-  id: number;
-  courseId: number;
+  id: string;
+  courseId: string;
   title: string;
   description: string;
 }

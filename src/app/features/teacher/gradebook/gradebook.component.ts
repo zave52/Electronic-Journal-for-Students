@@ -18,13 +18,14 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
+import { User, Assignment, Grade } from '../../../core/models';
 
 interface GradeCell {
-  studentId: number;
-  assignmentId: number;
+  studentId: string;
+  assignmentId: string;
   grade: number | null;
-  gradeId: number | null;
-  courseId: number;
+  gradeId: string | null;
+  courseId: string;
 }
 
 @Component({
@@ -35,10 +36,10 @@ interface GradeCell {
   styleUrls: ['./gradebook.component.css']
 })
 export class GradebookComponent implements OnInit, OnChanges, AfterViewInit {
-  @Input() courseId!: number;
+  @Input() courseId!: string;
 
-  students: any[] = [];
-  assignments: any[] = [];
+  students: User[] = [];
+  assignments: Assignment[] = [];
   gradeMatrix: Map<string, GradeCell> = new Map();
   loading = false;
   error: string | null = null;
@@ -94,19 +95,19 @@ export class GradebookComponent implements OnInit, OnChanges, AfterViewInit {
       enrollments: this.http.get<any[]>(`${environment.apiUrl}/enrollments?courseId=${this.courseId}`).pipe(
         catchError(() => of([]))
       ),
-      assignments: this.http.get<any[]>(`${environment.apiUrl}/assignments?courseId=${this.courseId}`).pipe(
+      assignments: this.http.get<Assignment[]>(`${environment.apiUrl}/assignments?courseId=${this.courseId}`).pipe(
         catchError(() => of([]))
       ),
-      grades: this.http.get<any[]>(`${environment.apiUrl}/grades?courseId=${this.courseId}`).pipe(
+      grades: this.http.get<Grade[]>(`${environment.apiUrl}/grades?courseId=${this.courseId}`).pipe(
         catchError(() => of([]))
       )
     }).subscribe({
       next: ({ enrollments, assignments, grades }) => {
-        const studentIds = enrollments.map((e: any) => Number(e.studentId));
+        const studentIds = enrollments.map((e: any) => e.studentId).filter(id => id != null);
 
         if (studentIds.length === 0) {
           this.students = [];
-          this.assignments = assignments.sort((a: any, b: any) => a.id - b.id);
+          this.assignments = assignments;
           this.buildGradeMatrix(grades);
           this.loading = false;
           this.cdr.markForCheck();
@@ -114,15 +115,15 @@ export class GradebookComponent implements OnInit, OnChanges, AfterViewInit {
         }
 
         const studentRequests = studentIds.map(id =>
-          this.http.get(`${environment.apiUrl}/users/${id}`).pipe(
+          this.http.get<User>(`${environment.apiUrl}/users/${id}`).pipe(
             catchError(() => of(null))
           )
         );
 
         forkJoin(studentRequests).subscribe({
-          next: (students: any[]) => {
-            this.students = students.filter(s => s !== null).sort((a: any, b: any) => a.name.localeCompare(b.name));
-            this.assignments = assignments.sort((a: any, b: any) => a.id - b.id);
+          next: (students) => {
+            this.students = students.filter((s): s is User => s !== null).sort((a, b) => a.name.localeCompare(b.name));
+            this.assignments = assignments;
             this.buildGradeMatrix(grades);
             this.loading = false;
             this.cdr.detectChanges();
@@ -142,15 +143,15 @@ export class GradebookComponent implements OnInit, OnChanges, AfterViewInit {
     });
   }
 
-  private buildGradeMatrix(grades: any[]): void {
+  private buildGradeMatrix(grades: Grade[]): void {
     this.gradeMatrix.clear();
 
     this.students.forEach(student => {
       this.assignments.forEach(assignment => {
-        const key = this.getCellKey(Number(student.id), Number(assignment.id));
+        const key = this.getCellKey(student.id, assignment.id);
         this.gradeMatrix.set(key, {
-          studentId: Number(student.id),
-          assignmentId: Number(assignment.id),
+          studentId: student.id,
+          assignmentId: assignment.id,
           grade: null,
           gradeId: null,
           courseId: this.courseId
@@ -158,33 +159,28 @@ export class GradebookComponent implements OnInit, OnChanges, AfterViewInit {
       });
     });
 
-    const gradesByKey = new Map<string, any[]>();
+    const gradesByKey = new Map<string, Grade[]>();
 
     grades.forEach(grade => {
-      const key = this.getCellKey(Number(grade.studentId), Number(grade.assignmentId));
+      const key = this.getCellKey(grade.studentId, grade.assignmentId);
       if (!gradesByKey.has(key)) {
         gradesByKey.set(key, []);
       }
       gradesByKey.get(key)!.push(grade);
     });
 
-    const duplicatesToDelete: number[] = [];
+    const duplicatesToDelete: string[] = [];
 
     gradesByKey.forEach((gradesForCell, key) => {
       const cell = this.gradeMatrix.get(key);
       if (!cell) return;
 
       if (gradesForCell.length > 1) {
-
-        gradesForCell.sort((a, b) => {
-          const idA = typeof a.id === 'string' ? parseInt(a.id, 16) : a.id;
-          const idB = typeof b.id === 'string' ? parseInt(b.id, 16) : b.id;
-          return idB - idA;
-        });
+        gradesForCell.sort((a, b) => (a.id < b.id ? 1 : -1));
 
         const keepGrade = gradesForCell[0];
         cell.grade = keepGrade.grade;
-        cell.gradeId = Number(keepGrade.id) || keepGrade.id;
+        cell.gradeId = keepGrade.id;
 
         for (let i = 1; i < gradesForCell.length; i++) {
           duplicatesToDelete.push(gradesForCell[i].id);
@@ -192,7 +188,7 @@ export class GradebookComponent implements OnInit, OnChanges, AfterViewInit {
       } else {
         const grade = gradesForCell[0];
         cell.grade = grade.grade;
-        cell.gradeId = Number(grade.id) || grade.id;
+        cell.gradeId = grade.id;
       }
     });
 
@@ -208,15 +204,15 @@ export class GradebookComponent implements OnInit, OnChanges, AfterViewInit {
     }
   }
 
-  getCellKey(studentId: number, assignmentId: number): string {
+  getCellKey(studentId: string, assignmentId: string): string {
     return `${studentId}-${assignmentId}`;
   }
 
-  getGradeCell(studentId: number, assignmentId: number): GradeCell | undefined {
+  getGradeCell(studentId: string, assignmentId: string): GradeCell | undefined {
     return this.gradeMatrix.get(this.getCellKey(studentId, assignmentId));
   }
 
-  onGradeChange(studentId: number, assignmentId: number, value: string): void {
+  onGradeChange(studentId: string, assignmentId: string, value: string): void {
     const cell = this.getGradeCell(studentId, assignmentId);
     if (!cell) return;
 
@@ -274,7 +270,7 @@ export class GradebookComponent implements OnInit, OnChanges, AfterViewInit {
     const saveRequests: Array<{ request: any; cellKey: string; isCreate: boolean }> = [];
 
     this.changedCells.forEach(cellKey => {
-      const [studentId, assignmentId] = cellKey.split('-').map(Number);
+      const [studentId, assignmentId] = cellKey.split('-');
       const cell = this.getGradeCell(studentId, assignmentId);
 
       if (!cell) return;
@@ -331,11 +327,11 @@ export class GradebookComponent implements OnInit, OnChanges, AfterViewInit {
         results.forEach((result, index) => {
           if (result && result.id && saveRequests[index].isCreate) {
             const cellKey = saveRequests[index].cellKey;
-            const [studentId, assignmentId] = cellKey.split('-').map(Number);
+            const [studentId, assignmentId] = cellKey.split('-');
             const cell = this.getGradeCell(studentId, assignmentId);
 
             if (cell) {
-              cell.gradeId = Number(result.id);
+              cell.gradeId = result.id;
             }
           }
         });
@@ -363,23 +359,23 @@ export class GradebookComponent implements OnInit, OnChanges, AfterViewInit {
     return this.invalidCells.size > 0;
   }
 
-  getValidationMessage(studentId: number, assignmentId: number): string | null {
+  getValidationMessage(studentId: string, assignmentId: string): string | null {
     const cellKey = this.getCellKey(studentId, assignmentId);
     return this.validationMessages.get(cellKey) || null;
   }
 
-  isInvalid(studentId: number, assignmentId: number): boolean {
+  isInvalid(studentId: string, assignmentId: string): boolean {
     return this.invalidCells.has(this.getCellKey(studentId, assignmentId));
   }
 
-  isChanged(studentId: number, assignmentId: number): boolean {
+  isChanged(studentId: string, assignmentId: string): boolean {
     return this.changedCells.has(this.getCellKey(studentId, assignmentId));
   }
 
-  getAverageForStudent(studentId: number): number | null {
+  getAverageForStudent(studentId: string): number | null {
     const grades: number[] = [];
     this.assignments.forEach(assignment => {
-      const cell = this.getGradeCell(studentId, Number(assignment.id));
+      const cell = this.getGradeCell(studentId, assignment.id);
       if (cell?.grade !== null && cell?.grade !== undefined) {
         grades.push(cell.grade);
       }
@@ -389,10 +385,10 @@ export class GradebookComponent implements OnInit, OnChanges, AfterViewInit {
     return Math.round(grades.reduce((sum, g) => sum + g, 0) / grades.length);
   }
 
-  getAverageForAssignment(assignmentId: number): number | null {
+  getAverageForAssignment(assignmentId: string): number | null {
     const grades: number[] = [];
     this.students.forEach(student => {
-      const cell = this.getGradeCell(Number(student.id), assignmentId);
+      const cell = this.getGradeCell(student.id, assignmentId);
       if (cell?.grade !== null && cell?.grade !== undefined) {
         grades.push(cell.grade);
       }
