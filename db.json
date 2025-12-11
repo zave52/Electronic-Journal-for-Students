@@ -1,166 +1,161 @@
 {
   "users": [
     {
-      "id": "1",
+      "id": "d4fa",
       "name": "Admin User",
       "email": "admin@university.edu",
       "password": "admin123",
       "role": "admin"
     },
     {
-      "id": "2",
+      "id": "cc21",
       "name": "Dr. John Smith",
       "email": "john.smith@university.edu",
-      "password": "teacher123",
-      "role": "teacher"
+      "role": "teacher",
+      "password": "teacher123"
     },
     {
-      "id": "3",
+      "id": "16c5",
       "name": "Dr. Sarah Johnson",
       "email": "sarah.johnson@university.edu",
-      "password": "teacher123",
-      "role": "teacher"
+      "role": "teacher",
+      "password": "teacher123"
     },
     {
-      "id": "4",
+      "id": "6f85",
       "name": "Alice Brown",
       "email": "alice.brown@student.edu",
-      "password": "student123",
-      "role": "student"
+      "role": "student",
+      "password": "student123"
     },
     {
-      "id": "5",
+      "id": "b5d3",
       "name": "Bob Wilson",
       "email": "bob.wilson@student.edu",
-      "password": "student123",
-      "role": "student"
+      "role": "student",
+      "password": "student123"
     }
   ],
   "courses": [
     {
-      "id": "1",
+      "id": "fc55",
       "name": "Introduction to Computer Science",
+      "teacherId": "cc21",
       "description": "Fundamental concepts of computer science and programming",
-      "syllabus": "Week 1: Introduction\nWeek 2: Variables and Data Types\nWeek 3: Control Structures",
-      "teacherId": 2
+      "syllabus": "Week 1: Introduction\nWeek 2: Variables and Data Types\nWeek 3: Control Structures"
     },
     {
-      "id": "2",
+      "id": "2d86",
       "name": "Web Development",
       "description": "Modern web development with HTML, CSS, and JavaScript",
       "syllabus": "Week 1: HTML Basics\nWeek 2: CSS Styling\nWeek 3: JavaScript Fundamentals",
-      "teacherId": 3
+      "teacherId": "16c5"
     }
   ],
   "lessons": [
     {
-      "id": "1",
-      "courseId": 1,
       "title": "Introduction to Programming",
-      "description": "Learn the basics of programming concepts"
+      "description": "Learn the basics of programming concepts",
+      "courseId": "fc55",
+      "id": "35e6"
     },
     {
-      "id": "2",
-      "courseId": 1,
+      "id": "e0fd",
       "title": "Variables and Data Types",
-      "description": "Understanding different types of data in programming"
+      "description": "Understanding different types of data in programming",
+      "courseId": "fc55"
     },
     {
-      "id": "3",
-      "courseId": 2,
+      "id": "54af",
       "title": "HTML Structure",
-      "description": "Building web pages with HTML"
+      "description": "Building web pages with HTML",
+      "courseId": "2d86"
     }
   ],
   "assignments": [
     {
-      "id": "1",
-      "lessonId": 1,
-      "courseId": 1,
+      "id": "d78e",
       "title": "Hello World Program",
       "instructions": "Write your first program that prints 'Hello World'",
-      "deadline": "2025-11-05T23:59:00Z"
+      "deadline": "2025-12-31",
+      "lessonId": "35e6",
+      "courseId": "fc55"
     },
     {
-      "id": "2",
-      "lessonId": 2,
-      "courseId": 1,
+      "id": "70e1",
       "title": "Variable Exercise",
       "instructions": "Create a program using different variable types",
-      "deadline": "2025-11-12T23:59:00Z"
+      "deadline": "2026-01-06",
+      "lessonId": "e0fd",
+      "courseId": "fc55"
     },
     {
-      "id": "3",
-      "lessonId": 3,
-      "courseId": 2,
+      "id": "a0d4",
       "title": "Build a Personal Page",
       "instructions": "Create a simple HTML page about yourself",
-      "deadline": "2025-11-10T23:59:00Z"
+      "deadline": "2025-12-29",
+      "lessonId": "54af",
+      "courseId": "2d86"
     }
   ],
   "grades": [
     {
-      "id": "1",
-      "studentId": 4,
-      "assignmentId": 1,
-      "courseId": 1,
+      "id": "3c8e",
+      "studentId": "6f85",
+      "assignmentId": "d78e",
+      "courseId": "fc55",
+      "grade": 90
+    },
+    {
+      "id": "9a27",
+      "studentId": "b5d3",
+      "assignmentId": "d78e",
+      "courseId": "fc55",
       "grade": 95
     },
     {
-      "id": "2",
-      "studentId": 5,
-      "assignmentId": 1,
-      "courseId": 1,
-      "grade": 88
+      "id": "e8b1",
+      "studentId": "6f85",
+      "assignmentId": "70e1",
+      "courseId": "fc55",
+      "grade": 80
     },
     {
-      "id": "3",
-      "studentId": 4,
-      "assignmentId": 3,
-      "courseId": 2,
-      "grade": 92
+      "id": "8c27",
+      "studentId": "6f85",
+      "assignmentId": "a0d4",
+      "courseId": "2d86",
+      "grade": 87
     }
   ],
   "enrollments": [
     {
-      "id": "1",
-      "courseId": 2,
-      "studentId": 4
+      "id": "ee29",
+      "courseId": "fc55",
+      "studentId": "6f85"
     },
     {
-      "id": "2",
-      "courseId": 2,
-      "studentId": 5
+      "id": "b8c1",
+      "courseId": "fc55",
+      "studentId": "b5d3"
     },
     {
-      "id": "3",
-      "courseId": 1,
-      "studentId": 4
+      "id": "8156",
+      "courseId": "2d86",
+      "studentId": "6f85"
     }
   ],
   "assignmentStatuses": [
     {
-      "id": "1",
-      "studentId": 4,
-      "assignmentId": 1,
+      "id": "a2bc",
+      "studentId": "b5d3",
+      "assignmentId": "d78e",
       "completed": true
     },
     {
-      "id": "2",
-      "studentId": 4,
-      "assignmentId": 2,
-      "completed": true
-    },
-    {
-      "id": "3",
-      "studentId": 4,
-      "assignmentId": 3,
-      "completed": true
-    },
-    {
-      "id": "4",
-      "studentId": 5,
-      "assignmentId": 1,
+      "id": "0111",
+      "studentId": "b5d3",
+      "assignmentId": "70e1",
       "completed": false
     }
   ]
